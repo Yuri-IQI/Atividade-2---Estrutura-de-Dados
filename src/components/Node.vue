@@ -1,9 +1,12 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
+import Node from "@/components/Node.vue";
 
-const predecessor = ref(null)
-const value = ref(null)
-const successor = ref(null)
+const props = defineProps<{
+  value?: string,
+  predecessor?: Node,
+  Successors?: Node[]
+}>()
 </script>
 
 <template>
