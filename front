@@ -1,0 +1,69 @@
+<script setup lang="ts">
+import { ref } from "vue";
+
+interface Node {
+  value: string;
+  predecessor: Node | null;
+  successors: [Node | null, Node | null];
+}
+
+const nodeCollection = ref<Node[]>([]);
+const nodeValue = ref('');
+const predecessor = ref('');
+const successor = ref('');
+const successorNodes = ref<Node[]>([]);
+
+const createNode = () => {
+  const newNode: Node = {
+    value: nodeValue.value,
+    predecessor: nodeCollection.value.find(n => n.value === predecessor.value) || null,
+    successors: [successorNodes.value[0] || null, successorNodes.value[1] || null]
+  };
+
+  console.log("New Node Created:", newNode);
+  nodeCollection.value.push(newNode);
+
+  nodeValue.value = '';
+  predecessor.value = '';
+  successorNodes.value = [];
+};
+
+const addSuccessor = () => {
+  if (successor.value && successorNodes.value.length < 2) {
+    const newSuccessor: Node = { value: successor.value, predecessor: null, successors: [null, null] };
+    successorNodes.value.push(newSuccessor);
+    successor.value = '';
+  } else {
+    alert("Max limit of successor nodes reached!");
+  }
+};
+</script>
+
+<template>
+  <div id="existing-nodes">
+    <div v-for="(node, index) in nodeCollection" :key="index">
+      <p>Node: {{ node.value }}</p>
+    </div>
+  </div>
+
+  <div id="node-menu">
+    <span id="node-value">
+      <input v-model="nodeValue" placeholder="Node Value" />
+      <input v-model="predecessor" placeholder="Predecessor Node" />
+
+      <div>
+        <span id="successors-list" v-for="(node, index) in successorNodes" :key="index">
+          Successor {{ index + 1 }}: {{ node.value }}
+        </span>
+
+        <input v-model="successor" placeholder="Add Successor Node" />
+        <button type="button" @click="addSuccessor">Add Successor</button>
+      </div>
+
+      <button type="submit" @click="createNode">Create Node</button>
+    </span>
+  </div>
+</template>
+
+<style scoped>
+</style>
