@@ -3,17 +3,26 @@ const tree = new BinaryTree();
 
 
 exports.insertNode = (req, res) => {
-    const {value} = req.body;
+    const { value, parent } = req.body;
 
-    let isRepeatedNode = tree.verifyNodeRepetition(value)
-    console.log(isRepeatedNode);
-    if (isRepeatedNode) {
-        return res.status(400).json({error: 'O valor já está presente na árvore'});
+    if (tree.verifyNodeRepetition(value)) {
+        return res.status(400).json({ error: "O valor já está presente na árvore" });
     }
-    tree.insert(value);
-    return res.status(200).json({message: 'Nó inserido com sucesso'});
-};
 
+    let parentNode = parent ? tree.findParentNode(parent) : null;
+
+    if (parent && !parentNode) {
+        return res.status(400).json({ error: "O nó pai não foi encontrado" });
+    }
+
+    if (parentNode && parentNode.leftId && parentNode.rightId) {
+        return res.status(400).json({ error: "O nó pai já possui dois filhos" });
+    }
+
+    tree.insert(value, parent);
+
+    return res.status(201).json({ message: "Nó inserido com sucesso" });
+};
 
 exports.getNodeInfo = (req, res) => {
     const { value } = req.params;

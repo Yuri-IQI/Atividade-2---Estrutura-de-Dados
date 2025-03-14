@@ -1,10 +1,10 @@
 class TreeNode {
-    constructor(id, value) {
+    constructor(id, value, parentId) {
         this.id = id;
         this.value = value;
         this.left = null;
         this.right = null;
-        this.parent = null;
+        this.parentId = parentId;
     }
 
     isLeaf() {

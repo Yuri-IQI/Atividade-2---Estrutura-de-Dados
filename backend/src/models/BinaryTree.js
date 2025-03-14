@@ -4,51 +4,75 @@ const e = require("express");
 
 class BinaryTree {
     constructor() {
-        this.treeNodes = new Set()
+        this.treeNodes = new Set();
         this.root = null;
+        this.nodeCounter = 0;
     }
 
-    createNode(value) {
-        let nodeId = this.treeNodes.size;
-        return new TreeNode(nodeId, value);
+    createNode(value, parentId) {
+        return new TreeNode(this.nodeCounter++, value, parentId);
     }
 
     verifyNodeRepetition(value) {
-        let newNode = this.createNode(value);
-        console.log(newNode, this.treeNodes);
-        return this.treeNodes.forEach(node => {
-            return node.value === value;
-        });
+        return [...this.treeNodes].some(node => node.value === value);
     }
 
-    insert(value) {
-        const newNode = this.createNode(value);
+    findNodeByValue(value) {
+        return [...this.treeNodes].find(node => node.value === value) || null;
+    }
+
+    findParentNode(parentValue) {
+        return this.findNodeByValue(parentValue);
+    }
+
+    compareValues(a, b) {
+        if (typeof a === "number" && typeof b === "number") return a - b;
+        if (typeof a === "string" && typeof b === "string") return a.localeCompare(b);
+        return String(a).localeCompare(String(b));
+    }
+
+    insert(value, parentValue = null) {
+        if (this.verifyNodeRepetition(value)) {
+            console.log(`Value '${value}' already exists in the tree.`);
+            return false;
+        }
+
+        const parentNode = parentValue != null ? this.findParentNode(parentValue) : null;
+
+        if (parentValue && !parentNode) {
+            console.error(`Parent node '${parentValue}' not found!`);
+            return false;
+        }
+
+        const newNode = this.createNode(value, parentNode ? parentNode.id : null);
 
         if (!this.root) {
             this.root = newNode;
         } else {
-            this._insertNode(this.root, newNode);
+            this._insertNode(newNode, parentNode);
         }
 
         this.treeNodes.add(newNode);
+        return true;
     }
 
-    _insertNode(node, newNode) {
-        if (newNode.value < node.value) {
-            if (!node.left) {
-                node.left = newNode;
-                newNode.parent = node;
-            } else {
-                this._insertNode(node.left, newNode);
-            }
-        } else {
-            if (!node.right) {
-                node.right = newNode;
-                newNode.parent = node;
-            } else {
-                this._insertNode(node.right, newNode);
-            }
+    _insertNode(newNode, parentNode) {
+        if (!parentNode) {
+            console.error("Parent node not found!");
+            return;
         }
+
+        if (!parentNode.leftId) {
+            parentNode.leftId = newNode.id;
+        } else if (!parentNode.rightId) {
+            parentNode.rightId = newNode.id;
+        } else {
+            console.error("Parent already has two children!");
+            return;
+        }
+
+        this.treeNodes.delete(parentNode);
+        this.treeNodes.add(parentNode);
     }
 
     find(value) {
