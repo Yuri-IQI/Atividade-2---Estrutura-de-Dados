@@ -1,17 +1,36 @@
 const TreeNode = require('./TreeNode');
+const {set} = require("express/lib/application");
+const e = require("express");
 
 class BinaryTree {
     constructor() {
+        this.treeNodes = new Set()
         this.root = null;
     }
 
+    createNode(value) {
+        let nodeId = this.treeNodes.size;
+        return new TreeNode(nodeId, value);
+    }
+
+    verifyNodeRepetition(value) {
+        let newNode = this.createNode(value);
+        console.log(newNode, this.treeNodes);
+        return this.treeNodes.forEach(node => {
+            return node.value === value;
+        });
+    }
+
     insert(value) {
-        const newNode = new TreeNode(value);
+        const newNode = this.createNode(value);
+
         if (!this.root) {
             this.root = newNode;
         } else {
             this._insertNode(this.root, newNode);
         }
+
+        this.treeNodes.add(newNode);
     }
 
     _insertNode(node, newNode) {
@@ -42,15 +61,13 @@ class BinaryTree {
         return value < node.value ? this._findNode(node.left, value) : this._findNode(node.right, value);
     }
 
-  
     getNodeDegree(value) {
         const node = this.find(value);
         return node ? node.getDegree() : -1; 
     }
 
-
     getNodeDepth(value) {
-        const node = this.find(value);
+        let node = this.find(value);
         let depth = 0;
         while (node && node.parent) {
             depth++;
@@ -58,7 +75,6 @@ class BinaryTree {
         }
         return depth;
     }
-
 
     getTreeDepth() {
         return this._getTreeDepth(this.root);
@@ -117,7 +133,6 @@ class BinaryTree {
             }
         }
     }
-
  
     printTree(node, prefix = '') {
         if (node) {
@@ -127,7 +142,6 @@ class BinaryTree {
         }
     }
 
-
     preOrderTraversal(node) {
         if (node) {
             console.log(node.value);
@@ -136,7 +150,6 @@ class BinaryTree {
         }
     }
 
-
     postOrderTraversal(node) {
         if (node) {
             this.postOrderTraversal(node.left);
@@ -144,7 +157,6 @@ class BinaryTree {
             console.log(node.value);
         }
     }
-
 
     inOrderTraversal(node) {
         if (node) {

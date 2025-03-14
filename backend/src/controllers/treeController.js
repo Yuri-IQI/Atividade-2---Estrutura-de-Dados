@@ -3,12 +3,15 @@ const tree = new BinaryTree();
 
 
 exports.insertNode = (req, res) => {
-    const { value } = req.body;
-    if (typeof value !== 'number') {
-        return res.status(400).json({ error: 'O valor deve ser um número' });
+    const {value} = req.body;
+
+    let isRepeatedNode = tree.verifyNodeRepetition(value)
+    console.log(isRepeatedNode);
+    if (isRepeatedNode) {
+        return res.status(400).json({error: 'O valor já está presente na árvore'});
     }
     tree.insert(value);
-    return res.status(200).json({ message: 'Nó inserido com sucesso' });
+    return res.status(200).json({message: 'Nó inserido com sucesso'});
 };
 
 
