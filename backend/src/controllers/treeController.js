@@ -1,7 +1,6 @@
 const BinaryTree = require('../models/BinaryTree');
 const tree = new BinaryTree();
 
-
 exports.insertNode = (req, res) => {
     const { value, parent } = req.body;
 
@@ -58,8 +57,18 @@ exports.getTreeInfo = (req, res) => {
     });
 };
 
-
 exports.printTree = (req, res) => {
     tree.printTree(tree.root);
     return res.status(200).json({ message: 'Árvore impressa no console' });
+};
+
+exports.getNodeFamily = (req, res) => {
+    const { value } = req.params;
+    const family = tree.getNodeFamily(value);
+
+    if (!family) {
+        return res.status(404).json({ error: 'Node or family not found' });
+    }
+
+    return res.json(family);
 };
