@@ -7,6 +7,31 @@ class BinaryTree {
         this.nodeCounter = 0;
     }
 
+    _assemblyLine(structuredTree, node) {
+        if (!node) return;
+    
+        structuredTree.push(node);
+    
+        if (node.leftId) {
+            let leftChild = this.findNodeById(node.leftId);
+            this._assemblyLine(structuredTree, leftChild);
+        }
+    
+        if (node.rightId) {
+            let rightChild = this.findNodeById(node.rightId);
+            this._assemblyLine(structuredTree, rightChild);
+        }
+    }
+    
+    getStructuredTree() {
+        let structuredTree = [];
+        structuredTree.push(this.root);
+        
+        this._assemblyLine(structuredTree, this.root);
+    
+        return structuredTree;
+    }    
+
     createNode(value, parentId) {
         return new TreeNode(this.nodeCounter++, value, parentId);
     }
@@ -41,22 +66,28 @@ class BinaryTree {
     }
     
     insert(value, parentValue) {
-        if (this.verifyNodeRepetition(value)) return false;
+        if (!value || this.verifyNodeRepetition(value)) return false;
     
         const parentNode = parentValue != null ? this.findParentNode(parentValue) : null;
-        if (parentValue && !parentNode) return false;
-    
-        const newNode = this.createNode(value, parentNode ? parentNode.id : null);
     
         if (!this.root) {
-            this.root = newNode;
-        } else {
-            this._insertNode(newNode, parentNode);
+            if (parentNode) return false;
+            this.root = this.createNode(value, null);
+            this.treeNodes.push(this.root);
+            return true;
         }
     
+        if (parentValue && !parentNode) return false;
+    
+        if (parentNode && parentNode.leftId && parentNode.rightId) return false;
+    
+        const newNode = this.createNode(value, parentNode.id);
+        this._insertNode(newNode, parentNode);
         this.treeNodes.push(newNode);
+        
         return true;
     }
+    
     
     _insertNode(newNode, parentNode) {
         if (!parentNode) return;
