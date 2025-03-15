@@ -13,12 +13,11 @@ app.use(bodyParser.json());
 app.post('/insert', treeController.insertNode);
 app.get('/node-info/:value',treeController.getNodeInfo);
 app.get('/tree-info',treeController.getTreeInfo);
-app.get('/print',treeController.printTree);
 app.get('/node-family/:value', treeController.getNodeFamily);
+app.get('/traversal', treeController.doTraversal)
 
 const APP_PORT = 4000;
 
 app.listen(APP_PORT,() => {
     console.log('-------Servidor Rodando-------')
 })
-

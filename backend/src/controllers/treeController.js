@@ -25,41 +25,15 @@ exports.insertNode = (req, res) => {
 
 exports.getNodeInfo = (req, res) => {
     const { value } = req.params;
-    const degree = tree.getNodeDegree(value);
-    const depth = tree.getNodeDepth(value);
-    const height = tree.getNodeHeight(value);
-    const level = tree.getNodeLevel(value);
-    const node = tree.find(value);
-    const parent = node ? node.parent : null;
-    const siblings = parent ? (parent.left !== node ? parent.left : parent.right) : null;
-    const isLeftChild = parent && parent.left === node;
+    let nodeInfo = tree.getNodeInfo(value);
 
-    return res.json({
-        degree,
-        depth,
-        height,
-        level,
-        parent,
-        siblings,
-        isLeftChild
-    });
+    if (!nodeInfo) return res.status(400).json({ error: "Nó não encontrado" });
+
+    return res.json(nodeInfo);
 };
 
 exports.getTreeInfo = (req, res) => {
-    const treeHeight = tree.getTreeHeight();
-    const treeLevel = tree.getTreeLevel();
-    const leafNodes = tree.findLeafNodes();
-
-    return res.json({
-        treeHeight,
-        treeLevel,
-        leafNodes
-    });
-};
-
-exports.printTree = (req, res) => {
-    tree.printTree(tree.root);
-    return res.status(200).json({ message: 'Árvore impressa no console' });
+    return res.json(tree.getTreeInfo());
 };
 
 exports.getNodeFamily = (req, res) => {
@@ -72,3 +46,12 @@ exports.getNodeFamily = (req, res) => {
 
     return res.json(family);
 };
+
+exports.doTraversal = (req, res) => {
+    const { traversalType } = req.body;
+
+    let traversalResult = tree.doTraversal(traversalType);
+    if (traversalResult === null) return res.status(400).json({ error: "Incorrect traversal request" });
+
+    return res.json(traversalResult);
+}

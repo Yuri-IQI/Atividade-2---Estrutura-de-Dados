@@ -35,12 +35,12 @@ class BinaryTree {
 
     calcNodeDegree(node) {
         let degree = 0;
-        if (node.left) degree++;
-        if (node.right) degree++;
+        if (node.leftId) degree++;
+        if (node.rightId) degree++;
         return degree;
     }
     
-    insert(value, parentValue = null) {
+    insert(value, parentValue) {
         if (this.verifyNodeRepetition(value)) return false;
     
         const parentNode = parentValue != null ? this.findParentNode(parentValue) : null;
@@ -84,53 +84,88 @@ class BinaryTree {
         return highestDegree;
     }
 
-    _getNodeDepth(node, depth) {
-        if (node.parentId !== null) {
-            let parentNode = node.parentId;
-            this._getNodeDepth(node, depth + 1);
+    _getNodeDepth(node) {
+        if (!node || node.parentId === null || node.parentId === undefined) {
+            return 0;
         }
-
-        return depth;
+    
+        let parentNode = this.findNodeById(node.parentId);
+        return 1 + this._getNodeDepth(parentNode);
     }
-
+    
     getNodeDepth(value) {
         let node = this.findNodeByValue(value);
-
+    
         if (!node) {
             return -1;
         }
+    
+        return this._getNodeDepth(node);
+    }
 
-        let depth = 0;
-        return this._getNodeDepth(node, depth);
+    _getNodeHeight(node) {
+        if (!node) return -1;
+    
+        if (!node.leftId && !node.rightId) return 0;
+    
+        const leftChild = this.findNodeById(node.leftId);
+        const rightChild = this.findNodeById(node.rightId);
+    
+        const leftHeight = this._getNodeHeight(leftChild);
+        const rightHeight = this._getNodeHeight(rightChild);
+    
+        return Math.max(leftHeight, rightHeight) + 1;
+    }
+    
+    getNodeHeight(node) {
+        return this._getNodeHeight(node);
     }
 
     getLeafNodes() {
         return this.treeNodes.filter(node => node.degree === 0);
     }
 
-    getTreeDepth() {
+    getTreeHeight() {
         let leafNodes = this.getLeafNodes();
-        let distanceMap = new Map();
+    
+        if (leafNodes.length === 0) return 0;
+    
+        return Math.max(...leafNodes.map(leaf => this.getNodeDepth(leaf.value)));
+    }    
 
-        leafNodes.forEach(leaf => {
-            let depth = this.getNodeDepth(leaf.value);
-            distanceMap.set(leaf.value, depth);
-        })
+    getTreeInfo() {
+        let treeDegree = this.getTreeDegree();
+        let treeHeight = this.getTreeHeight();
+        let treeLeafs = this.getLeafNodes();
 
-        let highestDistance = 0;
-        for (let distance of distanceMap.values()) {
-            if (distance > highestDistance) {
-                highestDistance = distance;
-            }
+        return {
+            treeDegree: treeDegree,
+            treeHeight: treeHeight,
+            treeLevel: treeHeight,
+            treeLeafs: treeLeafs
         }
+    }
 
-        return highestDistance;
+    getNodeInfo(value) {
+        let node = this.findNodeByValue(value);
+        if (!node) return null;
+        
+        let nodeDegree = node.degree;
+        let nodeDepth = this.getNodeDepth(value);
+        let nodeHeight = this.getNodeHeight(node);
+
+        return {
+            nodeDegree: nodeDegree,
+            nodeDepth: nodeDepth,
+            nodeHeight: nodeHeight,
+            nodeLevel: nodeDepth + 1
+        }
     }
 
     getNodeFamily(value) {
         let node = this.findNodeByValue(value);
     
-        if (!node || !node.parentId) {
+        if (typeof node === null || node.parentId === null) {
             console.error("Node or parent not found");
             return null;
         }
@@ -165,6 +200,51 @@ class BinaryTree {
             isLeftChild: isLeftChild,
             isRightChild: isRightChild
         };
+    }
+
+    doTraversal(traversalType) {
+        if (!this.root) return [];
+    
+        switch (traversalType) {
+            case "PREORDER":
+                return this.preOrderTraversal(this.root, []);
+            case "INORDER":
+                return this.inOrderTraversal(this.root, []);
+            case "POSTORDER":
+                return this.postOrderTraversal(this.root, []);
+            default:
+                throw new Error(`Unsupported traversal type: ${traversalType}`);
+        }
+    }
+    
+    preOrderTraversal(node, orderedTree) {
+        if (node === null) return orderedTree;
+    
+        orderedTree.push(node);
+        this.preOrderTraversal(this.findNodeById(node.leftId), orderedTree);
+        this.preOrderTraversal(this.findNodeById(node.rightId), orderedTree);
+    
+        return orderedTree;
+    }
+    
+    inOrderTraversal(node, orderedTree) {
+        if (node === null) return orderedTree;
+    
+        this.inOrderTraversal(this.findNodeById(node.leftId), orderedTree);
+        orderedTree.push(node);
+        this.inOrderTraversal(this.findNodeById(node.rightId), orderedTree);
+    
+        return orderedTree;
+    }
+    
+    postOrderTraversal(node, orderedTree) {
+        if (node === null) return orderedTree;
+    
+        this.postOrderTraversal(this.findNodeById(node.leftId), orderedTree);
+        this.postOrderTraversal(this.findNodeById(node.rightId), orderedTree);
+        orderedTree.push(node);
+    
+        return orderedTree;
     }
 }
 
