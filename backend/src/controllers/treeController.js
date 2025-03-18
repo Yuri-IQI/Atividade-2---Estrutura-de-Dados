@@ -67,7 +67,7 @@ exports.getNodeFamily = (req, res) => {
     const family = tree.getNodeFamily(value);
 
     if (!family) {
-        return res.status(404).json({ error: 'Node or family not found' });
+        return res.status(404).json({ error: 'Nó não encontrado' });
     }
 
     return res.json(family);
