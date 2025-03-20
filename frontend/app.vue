@@ -1,6 +1,12 @@
+<script setup lang="tsx">
+import BinaryTree from './components/BinaryTree.vue';
+import { useConsumer } from '~/composables/useConsumer';
+
+const structuredTree = await useConsumer();
+</script>
+
 <template>
   <div>
-    <NuxtRouteAnnouncer />
-    <NuxtWelcome />
+    <BinaryTree :structuredTree="structuredTree" />
   </div>
 </template>

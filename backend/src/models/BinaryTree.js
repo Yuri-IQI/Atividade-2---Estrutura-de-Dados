@@ -24,6 +24,8 @@ class BinaryTree {
     }
     
     getStructuredTree() {
+        if (!this.root) return [];
+
         let structuredTree = [];
         structuredTree.push(this.root);
         

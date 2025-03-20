@@ -15,6 +15,7 @@ app.get('/node-info/:value',treeController.getNodeInfo);
 app.get('/tree-info',treeController.getTreeInfo);
 app.get('/node-family/:value', treeController.getNodeFamily);
 app.get('/traversal', treeController.doTraversal)
+app.get('/structured-tree', treeController.getStructuredTree);
 
 const APP_PORT = 4000;
 
