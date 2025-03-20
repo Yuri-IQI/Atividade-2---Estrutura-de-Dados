@@ -1,15 +1,15 @@
 <template>
     <main id="tree">
         <div class="node-field">
-            <BlankNode 
+            <BlankNode
                 v-if="structuredTree.length === 0"
                 :nodeId="structuredTree.length"
-                @selectNode="selectNode"
+                @selectNode="handleNodeSelection"
             />
-            <NodeMenu  v-if="selectedNode !== null" :nodeId="selectedNode" :nodeType="checkNodeInsertion(selectedNode)" />
+<!--            <NodeMenu  v-if="selectedNode !== null" :nodeId="selectedNode" :nodeType="checkNodeInsertion(selectedNode)" />-->
         </div>
 
-        <div v-for="node in structuredTree" :key="node.nodeId" @click="selectNode(node.nodeId)">
+        <div v-for="node in structuredTree" :key="node.nodeId" @click="handleNodeSelection(node.nodeId)">
             {{ node.nodeValue }}
         </div>
     </main>
@@ -23,25 +23,38 @@ import type { Node } from '../types/Node';
 import { NodeTypeEnum } from '~/types/NodeTypeEnum';
 
 const props = defineProps<{ structuredTree: Node[] }>();
+const emit = defineEmits(['selectNode']);
 
-const selectedNode = ref<number | null>(null);
-
-const selectNode = (nodeId: number) => {
-    selectedNode.value = nodeId;
+const handleNodeSelection = (nodeId: number) => {
+  emit('selectNode', nodeId);
 };
 
-const checkNodeInsertion = (nodeId: number): NodeTypeEnum => {
-    return props.structuredTree.some(node => node.nodeId === nodeId) 
-        ? NodeTypeEnum.ACTIVE 
-        : NodeTypeEnum.BLANK;
-};
+// const selectedNode = ref<number | null>(null);
+//
+// const selectNode = (nodeId: number) => {
+//   selectedNode.value = selectedNode.value === nodeId ? null : nodeId;
+// };
+//
+// const checkNodeInsertion = (nodeId: number): NodeTypeEnum => {
+//     return props.structuredTree.some(node => node.nodeId === nodeId)
+//         ? NodeTypeEnum.ACTIVE
+//         : NodeTypeEnum.BLANK;
+// };
 </script>
 
 <style scoped>
 #tree {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.node-field {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
 }
 </style>

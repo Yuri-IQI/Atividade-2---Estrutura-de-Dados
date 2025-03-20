@@ -1,12 +1,49 @@
+<template>
+  <div id="all">
+    <BinaryTree :structuredTree="structuredTree" @selectNode="getSelectedNode" />
+    <aside>
+      <NodeMenu
+          v-if="selectedNode !== null"
+          :nodeId="selectedNode"
+          :nodeType="checkNodeInsertion(selectedNode)"
+      />
+    </aside>
+  </div>
+</template>
+
 <script setup lang="tsx">
 import BinaryTree from './components/BinaryTree.vue';
 import { useConsumer } from '~/composables/useConsumer';
+import NodeMenu from "~/components/NodeMenu.vue";
+import {ref} from "vue";
+import {NodeTypeEnum} from "~/types/NodeTypeEnum";
 
 const structuredTree = await useConsumer();
+
+const selectedNode = ref<number | null>(null);
+
+const getSelectedNode = (nodeId: number) => {
+  selectedNode.value = selectedNode.value === nodeId ? null : nodeId;
+};
+
+const checkNodeInsertion = (nodeId: number): NodeTypeEnum => {
+  return structuredTree.some(node => node.nodeId === nodeId)
+      ? NodeTypeEnum.ACTIVE
+      : NodeTypeEnum.BLANK;
+};
 </script>
 
-<template>
-  <div>
-    <BinaryTree :structuredTree="structuredTree" />
-  </div>
-</template>
+<style>
+#all {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+aside {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+</style>

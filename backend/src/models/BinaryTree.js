@@ -34,8 +34,8 @@ class BinaryTree {
         return structuredTree;
     }    
 
-    createNode(value, parentId) {
-        return new TreeNode(this.nodeCounter++, value, parentId);
+    createNode(id, value, parentId) {
+        return new TreeNode(id, value, parentId);
     }
 
     verifyNodeRepetition(value) {
@@ -67,14 +67,14 @@ class BinaryTree {
         return degree;
     }
     
-    insert(value, parentValue) {
+    insert(id, value, parentValue) {
         if (!value || this.verifyNodeRepetition(value)) return false;
     
         const parentNode = parentValue != null ? this.findParentNode(parentValue) : null;
     
         if (!this.root) {
             if (parentNode) return false;
-            this.root = this.createNode(value, null);
+            this.root = this.createNode(id, value, null);
             this.treeNodes.push(this.root);
             return true;
         }
@@ -83,7 +83,7 @@ class BinaryTree {
     
         if (parentNode && parentNode.leftId && parentNode.rightId) return false;
     
-        const newNode = this.createNode(value, parentNode.id);
+        const newNode = this.createNode(id, value, parentNode.id);
         this._insertNode(newNode, parentNode);
         this.treeNodes.push(newNode);
         

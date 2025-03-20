@@ -6,7 +6,7 @@ exports.getStructuredTree = (req, res) => {
 };
 
 exports.insertNode = (req, res) => {
-    const { value, parent } = req.body;
+    const { id, value, parent } = req.body;
 
     if (!value) {
         return res.status(400).json({ error: "O valor do nó é obrigatório" });
@@ -26,7 +26,7 @@ exports.insertNode = (req, res) => {
         return res.status(400).json({ error: "O nó pai já possui dois filhos" });
     }
 
-    if (!tree.insert(value, parent)) {
+    if (!tree.insert(id, value, parent)) {
         return res.status(400).json({ error: "Nó inválido: apenas um único nó raiz permitido e sem nós soltos" });
     }
 

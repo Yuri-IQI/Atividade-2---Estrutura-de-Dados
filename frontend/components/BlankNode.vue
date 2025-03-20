@@ -1,6 +1,6 @@
 <template>
     <div @click="insertNewNode" class="blank-node" tabindex="0">
-        <BlankNodeIcon class="icon" />
+        <BlankNodeIcon width="80" height="80" class="icon" />
     </div>
 </template>
 
@@ -11,12 +11,12 @@ const props = defineProps<{ nodeId: number }>();
 const emit = defineEmits(['selectNode']);
 
 const insertNewNode = () => {
-    emit('selectNode', props.nodeId);
+  emit('selectNode', props.nodeId);
 };
 </script>
 
 <style scoped>
 .blank-node {
-    cursor: pointer;
+  cursor: pointer;
 }
 </style>
