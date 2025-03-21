@@ -1,7 +1,7 @@
 class TreeNode {
     constructor(id, value, parentId) {
-        this.id = id;
-        this.value = value;
+        this.nodeId = id;
+        this.nodeValue = value;
         this.leftId = null;
         this.rightId = null;
         this.parentId = parentId;

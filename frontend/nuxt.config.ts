@@ -5,4 +5,7 @@ export default defineNuxtConfig({
   vite: {
     plugins: [require('vite-svg-loader')()],
   },
+  devServer: {
+    port: 3005
+  }
 })

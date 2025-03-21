@@ -1,6 +1,6 @@
 <template>
     <div @click="insertNewNode" class="blank-node" tabindex="0">
-        <BlankNodeIcon width="80" height="80" class="icon" />
+        <BlankNodeIcon width="60" height="60" class="icon" />
     </div>
 </template>
 

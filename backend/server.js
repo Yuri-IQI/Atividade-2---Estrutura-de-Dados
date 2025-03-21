@@ -17,7 +17,7 @@ app.get('/node-family/:value', treeController.getNodeFamily);
 app.get('/traversal', treeController.doTraversal)
 app.get('/structured-tree', treeController.getStructuredTree);
 
-const APP_PORT = 4000;
+const APP_PORT = 4500;
 
 app.listen(APP_PORT,() => {
     console.log('-------Servidor Rodando-------')

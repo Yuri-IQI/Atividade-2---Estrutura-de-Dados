@@ -9,7 +9,7 @@
           v-if="selectedNode !== null"
           :nodeId="selectedNode"
           :nodeType="checkNodeInsertion(selectedNode)"
-          @updateNodeTree="updateNodeTree(nodeTree)"
+          @updateNodeTree="updateNodeTree"
       />
     </aside>
   </div>
@@ -21,8 +21,14 @@ import { useConsumer } from '~/composables/useConsumer';
 import NodeMenu from "~/components/NodeMenu.vue";
 import {ref} from "vue";
 import {NodeTypeEnum} from "~/types/NodeTypeEnum";
+import type { Node } from './types/Node';
 
-let structuredTree = await useConsumer();
+const structuredTree = ref<Node[]>([]);
+
+onMounted(async () => {
+  structuredTree.value = await useConsumer();
+  console.log(structuredTree.value)
+});
 
 const selectedNode = ref<number | null>(null);
 
@@ -31,11 +37,11 @@ const getSelectedNode = (nodeId: number) => {
 };
 
 const updateNodeTree = (nodeTree: Node[]) => {
-  structuredTree = nodeTree;
+  structuredTree.value = nodeTree;
 }
 
 const checkNodeInsertion = (nodeId: number): NodeTypeEnum => {
-  return structuredTree.some(node => node.nodeId === nodeId)
+  return structuredTree.value.some(node => node.nodeId === nodeId)
       ? NodeTypeEnum.ACTIVE
       : NodeTypeEnum.BLANK;
 };

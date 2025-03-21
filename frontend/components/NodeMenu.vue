@@ -22,27 +22,28 @@ const props = defineProps<{
   parentId?: number;
 }>();
 
-const emit = defineEmits(['updateTree']);
+const emit = defineEmits(['updateNodeTree']);
 
 const nodeValue = ref<string>('');
 
 const createNode = async () => {
   try {
     const nodeRequest: NodeRequest = {
-      id: props.nodeId,
-      value: nodeValue.value,
-      parent: props.parentId ?? 0,
+      nodeId: props.nodeId,
+      nodeValue: nodeValue.value,
+      parentId: props.parentId ?? 0,
     };
 
-    const response = await axios.post('http://localhost:4000/insert', nodeRequest);
-    console.log('Node created:', response);
+    const response = await axios.post('http://localhost:4500/insert', nodeRequest);
+    updateNodeTree(response.data.tree)
   } catch (error) {
     console.error('Error creating node:', error);
   }
 };
 
 const updateNodeTree = (nodeTree: Node[]) => {
-  emit('updateTree', nodeTree);
+  console.log(nodeTree);
+  emit('updateNodeTree', nodeTree);
 }
 </script>
 

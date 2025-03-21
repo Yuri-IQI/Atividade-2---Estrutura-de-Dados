@@ -1,5 +1,5 @@
 export interface NodeRequest {
-    id: number,
-    value: string,
-    parent: number
+    nodeId: number,
+    nodeValue: string,
+    parentId: number
 }

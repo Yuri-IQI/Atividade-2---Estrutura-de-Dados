@@ -26,9 +26,7 @@ class BinaryTree {
     getStructuredTree() {
         if (!this.root) return [];
 
-        let structuredTree = [];
-        structuredTree.push(this.root);
-        
+        let structuredTree = [];        
         this._assemblyLine(structuredTree, this.root);
     
         return structuredTree;
@@ -73,7 +71,7 @@ class BinaryTree {
         const parentNode = parentValue != null ? this.findParentNode(parentValue) : null;
     
         if (!this.root) {
-            if (parentNode) return false;
+            if (parentNode !== null) return false;
             this.root = this.createNode(id, value, null);
             this.treeNodes.push(this.root);
             return true;

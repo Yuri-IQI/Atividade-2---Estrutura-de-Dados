@@ -2,23 +2,23 @@ const BinaryTree = require('../models/BinaryTree');
 const tree = new BinaryTree();
 
 exports.getStructuredTree = (req, res) => {
-    res.json(tree.getStructuredTree());
+    res.json(tree.doTraversal('PREORDER'));
 };
 
 exports.insertNode = (req, res) => {
-    const { id, value, parent } = req.body;
+    const { nodeId, nodeValue, parentId } = req.body;
 
-    if (!value) {
+    if (!nodeValue) {
         return res.status(400).json({ error: "O valor do nó é obrigatório" });
     }
 
-    if (tree.verifyNodeRepetition(value)) {
+    if (tree.verifyNodeRepetition(nodeValue)) {
         return res.status(400).json({ error: "O valor já está presente na árvore" });
     }
 
-    const parentNode = parent ? tree.findNodeByValue(parent) : null;
+    const parentNode = parentId ? tree.findNodeByValue(parentId) : null;
 
-    if (parent && !parentNode) {
+    if (parentId && !parentNode) {
         return res.status(400).json({ error: "O nó pai não foi encontrado" });
     }
 
@@ -26,7 +26,7 @@ exports.insertNode = (req, res) => {
         return res.status(400).json({ error: "O nó pai já possui dois filhos" });
     }
 
-    if (!tree.insert(id, value, parent)) {
+    if (!tree.insert(nodeId, nodeValue, parentId)) {
         return res.status(400).json({ error: "Nó inválido: apenas um único nó raiz permitido e sem nós soltos" });
     }
 
