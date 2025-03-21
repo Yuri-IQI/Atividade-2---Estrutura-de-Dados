@@ -14,12 +14,15 @@ import { ref } from 'vue';
 import axios from 'axios';
 import type { NodeRequest } from '~/types/NodeRequest';
 import type { NodeTypeEnum } from '~/types/NodeTypeEnum';
+import type {Node} from "~/types/Node";
 
 const props = defineProps<{
   nodeId: number;
   nodeType: NodeTypeEnum;
   parentId?: number;
 }>();
+
+const emit = defineEmits(['updateTree']);
 
 const nodeValue = ref<string>('');
 
@@ -37,6 +40,10 @@ const createNode = async () => {
     console.error('Error creating node:', error);
   }
 };
+
+const updateNodeTree = (nodeTree: Node[]) => {
+  emit('updateTree', nodeTree);
+}
 </script>
 
 <style scoped>

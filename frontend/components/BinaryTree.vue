@@ -16,11 +16,8 @@
 </template>
 
 <script setup lang="tsx">
-import { ref, defineProps } from 'vue';
 import { BlankNode } from '#components';
-import NodeMenu from './NodeMenu.vue';
 import type { Node } from '../types/Node';
-import { NodeTypeEnum } from '~/types/NodeTypeEnum';
 
 const props = defineProps<{ structuredTree: Node[] }>();
 const emit = defineEmits(['selectNode']);
@@ -28,18 +25,6 @@ const emit = defineEmits(['selectNode']);
 const handleNodeSelection = (nodeId: number) => {
   emit('selectNode', nodeId);
 };
-
-// const selectedNode = ref<number | null>(null);
-//
-// const selectNode = (nodeId: number) => {
-//   selectedNode.value = selectedNode.value === nodeId ? null : nodeId;
-// };
-//
-// const checkNodeInsertion = (nodeId: number): NodeTypeEnum => {
-//     return props.structuredTree.some(node => node.nodeId === nodeId)
-//         ? NodeTypeEnum.ACTIVE
-//         : NodeTypeEnum.BLANK;
-// };
 </script>
 
 <style scoped>
