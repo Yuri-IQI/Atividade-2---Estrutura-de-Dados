@@ -167,13 +167,13 @@ class BinaryTree {
     getTreeInfo() {
         let treeDegree = this.getTreeDegree();
         let treeHeight = this.getTreeHeight();
-        let treeLeafs = this.getLeafNodes();
+        let treeleaves = this.getLeafNodes();
 
         return {
             treeDegree: treeDegree,
             treeHeight: treeHeight,
             treeLevel: treeHeight,
-            treeLeafs: treeLeafs
+            treeleaves: treeleaves
         }
     }
 

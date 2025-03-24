@@ -9,6 +9,7 @@ import BlankNodeIcon from '@/assets/icons/blank-node.svg';
 
 const props = defineProps<{ nodeId: number }>();
 const emit = defineEmits(['selectNode']);
+console.log(props.nodeId);
 
 const insertNewNode = () => {
   emit('selectNode', props.nodeId);

@@ -26,8 +26,8 @@ import type { Node } from './types/Node';
 const structuredTree = ref<Node[]>([]);
 
 onMounted(async () => {
-  structuredTree.value = await useConsumer();
-  console.log(structuredTree.value)
+  const treeData = await useConsumer();
+  structuredTree.value = treeData.structuredTree?.value ?? [];
 });
 
 const selectedNode = ref<number | null>(null);
