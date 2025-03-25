@@ -6,7 +6,7 @@ exports.getStructuredTree = (req, res) => {
 };
 
 exports.insertNode = (req, res) => {
-    const { nodeId, nodeValue, parentId } = req.body;
+    const { nodeId, nodeValue, parentId, position } = req.body;
 
     if (!nodeValue) {
         return res.status(400).json({ error: "O valor do nó é obrigatório" });
@@ -16,18 +16,22 @@ exports.insertNode = (req, res) => {
         return res.status(400).json({ error: "O valor já está presente na árvore" });
     }
 
-    const parentNode = parentId ? tree.findNodeByValue(parentId) : null;
+    const parentNode = parentId !== null ? tree.findNodeById(parentId) : null;
 
-    if (parentId && !parentNode) {
+    if (parentId && parentNode === null) {
         return res.status(400).json({ error: "O nó pai não foi encontrado" });
     }
 
-    if (parentNode && parentNode.leftId && parentNode.rightId) {
+    if (parentNode !== null && parentNode.leftId && parentNode.rightId) {
         return res.status(400).json({ error: "O nó pai já possui dois filhos" });
     }
 
-    if (!tree.insert(nodeId, nodeValue, parentId)) {
-        return res.status(400).json({ error: "Nó inválido: apenas um único nó raiz permitido e sem nós soltos" });
+    if ((position === 'L' && parentNode.leftId) || (position === 'R' && parentNode.rightId)) {
+        return res.status(400).json({ error: "Já existe um nó nessa posição" })
+    }
+
+    if (!tree.insert(nodeId, nodeValue, parentNode, position)) {
+        return res.status(400).json({ error: "Nó inválido: apenas um único nó raiz permitido" });
     }
 
     res.status(201).json({ message: "Nó inserido com sucesso", tree: tree.treeNodes });

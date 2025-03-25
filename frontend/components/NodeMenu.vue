@@ -1,50 +1,49 @@
 <template>
   <div class="nodeMenu">
-    <span>{{ `Node ID: ${nodeId}` }}</span>
+    <span>{{ `Node ID: ${node.nodeId}` }}</span>
     <div>
       <label for="node-value">Valor do Nó:</label>
       <input id="node-value" v-model="nodeValue" placeholder="Valor do Nó" />
-      <button @click="createNode">Create Node</button>
+      <button @click="createNode" :disabled="!nodeValue.trim()">Create Node</button>
     </div>
   </div>
 </template>
 
 <script setup lang="tsx">
-import { ref } from 'vue';
 import axios from 'axios';
 import type { NodeRequest } from '~/types/NodeRequest';
-import type { NodeTypeEnum } from '~/types/NodeTypeEnum';
-import type {Node} from "~/types/Node";
+import { NodeTypeEnum } from '~/types/NodeTypeEnum';
+import type { Node } from "~/types/Node";
 
-const props = defineProps<{
-  nodeId: number;
-  nodeType: NodeTypeEnum;
-  parentId?: number;
-}>();
-
+const props = defineProps<{ node: Node; nodeType: NodeTypeEnum }>();
 const emit = defineEmits(['updateNodeTree']);
 
-const nodeValue = ref<string>('');
+const nodeValue = ref('');
+
+watch(() => props.nodeType,
+  (newType) => {
+    nodeValue.value = newType === NodeTypeEnum.BLANK ? '' : props.node.nodeValue;
+  },{ immediate: true }
+);
 
 const createNode = async () => {
+  if (!nodeValue.value.trim()) return;
+
   try {
     const nodeRequest: NodeRequest = {
-      nodeId: props.nodeId,
-      nodeValue: nodeValue.value,
-      parentId: props.parentId ?? 0,
+      nodeId: props.node.nodeId,
+      nodeValue: nodeValue.value.trim(),
+      parentId: props.node.parentId ?? null,
+      position: props.node.position
     };
 
-    const response = await axios.post('http://localhost:4500/insert', nodeRequest);
-    updateNodeTree(response.data.tree)
+    const { data } = await axios.post('http://localhost:4500/insert', nodeRequest);
+    emit('updateNodeTree', data.tree);
+    nodeValue.value = '';
   } catch (error) {
     console.error('Error creating node:', error);
   }
 };
-
-const updateNodeTree = (nodeTree: Node[]) => {
-  console.log(nodeTree);
-  emit('updateNodeTree', nodeTree);
-}
 </script>
 
 <style scoped>
@@ -55,5 +54,6 @@ const updateNodeTree = (nodeTree: Node[]) => {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  gap: 8px;
 }
 </style>

@@ -2,13 +2,14 @@
   <div id="all">
     <BinaryTree
         :structuredTree="structuredTree"
+        :treeLevels="treeLevels"
         @selectNode="getSelectedNode"
     />
     <aside>
       <NodeMenu
           v-if="selectedNode !== null"
-          :nodeId="selectedNode"
-          :nodeType="checkNodeInsertion(selectedNode)"
+          :node="selectedNode"
+          :nodeType="checkNodeInsertion(selectedNode.nodeId)"
           @updateNodeTree="updateNodeTree"
       />
     </aside>
@@ -24,16 +25,48 @@ import {NodeTypeEnum} from "~/types/NodeTypeEnum";
 import type { Node } from './types/Node';
 
 const structuredTree = ref<Node[]>([]);
+const selectedNode = ref<Node | null>(null);
+const treeLevels = ref<Node[][]>([]);
 
 onMounted(async () => {
   const treeData = await useConsumer();
   structuredTree.value = treeData.structuredTree?.value ?? [];
+  assignTreeLevels();
+  console.log(treeLevels.value);
 });
 
-const selectedNode = ref<number | null>(null);
+const assignTreeLevels = () => {
+  treeLevels.value = [];
 
-const getSelectedNode = (nodeId: number) => {
-  selectedNode.value = selectedNode.value === nodeId ? null : nodeId;
+  const rootNode = structuredTree.value.find(node => node.nodeId === 0);
+  if (!rootNode) return;
+
+  treeLevels.value.push([rootNode]);
+
+  structuredTree.value.forEach(node => {
+    if (node.nodeId === 0) return;
+
+    let parentLevelIndex = treeLevels.value.findIndex(level => 
+      level.some(parent => parent.nodeId === node.parentId)
+    );
+
+    if (parentLevelIndex !== -1) {
+      const nextLevelIndex = parentLevelIndex + 1;
+      if (!treeLevels.value[nextLevelIndex]) {
+        treeLevels.value[nextLevelIndex] = [];
+      }
+      treeLevels.value[nextLevelIndex].push(node);
+    }
+  });
+}
+
+const getSelectedNode = (node: Node) => {
+  if (selectedNode.value?.nodeId === node.nodeId) {
+    selectedNode.value = null;
+    return;
+  }
+
+  selectedNode.value = node;
 };
 
 const updateNodeTree = (nodeTree: Node[]) => {
@@ -42,8 +75,8 @@ const updateNodeTree = (nodeTree: Node[]) => {
 
 const checkNodeInsertion = (nodeId: number): NodeTypeEnum => {
   return structuredTree.value.some(node => node.nodeId === nodeId)
-      ? NodeTypeEnum.ACTIVE
-      : NodeTypeEnum.BLANK;
+    ? NodeTypeEnum.ACTIVE
+    : NodeTypeEnum.BLANK;
 };
 </script>
 

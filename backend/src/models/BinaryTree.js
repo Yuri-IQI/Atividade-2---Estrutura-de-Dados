@@ -37,15 +37,15 @@ class BinaryTree {
     }
 
     verifyNodeRepetition(value) {
-        return this.treeNodes.some(node => node.value === value);
+        return this.treeNodes.some(node => node.nodeValue === value);
     }
 
     findNodeById(nodeId) {
-        return this.treeNodes.find(node => node.id === nodeId) || null;
+        return this.treeNodes.find(node => node.nodeId === nodeId) || null;
     }
 
     findNodeByValue(value) {
-        return this.treeNodes.find(node => node.value === value) || null;
+        return this.treeNodes.find(node => node.nodeValue === value) || null;
     }
 
     findParentNode(parentValue) {
@@ -65,47 +65,43 @@ class BinaryTree {
         return degree;
     }
     
-    insert(id, value, parentValue) {
+    insert(id, value, parentNode, position) {
         if (!value || this.verifyNodeRepetition(value)) return false;
-    
-        const parentNode = parentValue != null ? this.findParentNode(parentValue) : null;
-    
+        
         if (!this.root) {
             if (parentNode !== null) return false;
-            this.root = this.createNode(id, value, null);
+            this.root = this.createNode(id, value, parentNode);
             this.treeNodes.push(this.root);
             return true;
         }
     
-        if (parentValue && !parentNode) return false;
-    
-        if (parentNode && parentNode.leftId && parentNode.rightId) return false;
-    
         const newNode = this.createNode(id, value, parentNode.id);
-        this._insertNode(newNode, parentNode);
+        this.associateWithParent(newNode, parentNode, position);
         this.treeNodes.push(newNode);
         
         return true;
     }
     
     
-    _insertNode(newNode, parentNode) {
+    associateWithParent(newNode, parentNode, position) {
         if (!parentNode) return;
     
-        if (!parentNode.leftId) {
-            parentNode.leftId = newNode.id;
-        } else if (!parentNode.rightId) {
-            parentNode.rightId = newNode.id;
+        if (position === 'L' && !parentNode.leftId) {
+            parentNode.leftId = newNode.nodeId;
+        } else if (position === 'R' && !parentNode.rightId) {
+            parentNode.rightId = newNode.nodeId;
+        } else {
+            return;
         }
     
         parentNode.degree = this.calcNodeDegree(parentNode);
     
-        const parentIndex = this.treeNodes.findIndex(node => node.id === parentNode.id);
+        const parentIndex = this.treeNodes.findIndex(node => node.nodeId === parentNode.nodeId);
         if (parentIndex !== -1) {
             this.treeNodes[parentIndex] = parentNode;
         }
     
-        newNode.parentId = parentNode.id;
+        newNode.parentId = parentNode.nodeId;
     }
     
     getTreeDegree() {
@@ -207,7 +203,7 @@ class BinaryTree {
         let isLeftChild = false;
         let isRightChild = false;
 
-        if (parentNode.leftId === node.id) {
+        if (parentNode.leftId === node.nodeId) {
             siblingId = parentNode.rightId;
             isLeftChild = true;
         } else {
@@ -220,7 +216,7 @@ class BinaryTree {
         if (parentNode.parentId) {
             let grandParentNode = this.findNodeById(parentNode.parentId);
 
-            let uncleId = grandParentNode.leftId === parentNode.id ? grandParentNode.rightId : grandParentNode.leftId;
+            let uncleId = grandParentNode.leftId === parentNode.nodeId ? grandParentNode.rightId : grandParentNode.leftId;
             uncleNode = uncleId ? this.findNodeById(uncleId) : null;
         }
     
