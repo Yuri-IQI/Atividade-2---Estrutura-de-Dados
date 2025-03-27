@@ -11,7 +11,7 @@
           :node="node" 
           @click="handleNodeSelection(node)" 
           :style="{
-            left: node.position ? (node.position === 'L' ? '-3em' : '3em') : '0em'
+            left: `${placeNode(node.nodeId)}%`
           }"
         />
       </div>
@@ -26,9 +26,9 @@
 </template>
 
 <script setup lang="ts">
-import { BlankNode, ExistingNode, VisualConnection } from '#components';
-import type { Node } from '~/types/Node';
-import type { Connection } from '~/types/Connection';
+import {BlankNode, ExistingNode, VisualConnection} from '#components';
+import type {Node} from '~/types/Node';
+import type {Connection} from '~/types/Connection';
 
 const props = defineProps<{ 
   structuredTree: Node[],
@@ -36,9 +36,9 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits(['selectNode']);
-const connections = ref<Connection[]>();
+const connections = ref<Connection[]>([]);
 
-const nodeMapping = new Map<Node, string>([]);
+const nodeMapping = new Map<number, number>([]);
 
 let resizeObserver: ResizeObserver;
 let mutationObserver:  MutationObserver;
@@ -67,7 +67,6 @@ onMounted(() => {
       mutationObserver.observe(element, { attributes: true, childList: true, subtree: true });
     }
   });
-  console.log(props.structuredTree);
   window.addEventListener('resize', recalculateNodeCoordinates);
 });
 
@@ -118,7 +117,7 @@ const getNodeCoordinates = (nodeId: number) => {
 }
 
 const recalculateNodeCoordinates = () => {
-  connections.value = connections.value.map(connection => ({
+  connections.value = connections.value?.map(connection => ({
     ...connection,
     parentCoordinates: getNodeCoordinates(connection.parentId),
     childCoordinates: getNodeCoordinates(connection.childId),
@@ -127,13 +126,24 @@ const recalculateNodeCoordinates = () => {
 
 const placeNode = (nodeId: number) => {
   let node = props.structuredTree.find(n => n.nodeId === nodeId);
-  
-  if (node?.nodeId === 0) {
-    nodeMapping.set(node,'0em');
-  };
-  
-  let parentNode = props.structuredTree.find(n => n.nodeId === node?.parentId);
-  let nodePosition = 
+
+  if (node) {
+    console.log(node);
+    if (node.parentId === null) {
+      let rootPosition = 50;
+
+      nodeMapping.set(nodeId, rootPosition);
+      return rootPosition;
+    }
+
+    let parentPoint = nodeMapping.get(node.parentId);
+    console.log(parentPoint);
+    let nodePoint = (parentPoint !== undefined) ? (node.position === 'L' ? parentPoint - (parentPoint/2) : parentPoint + (parentPoint/2)) : 0;
+    nodeMapping.set(nodeId, nodePoint);
+
+    console.log(nodePoint);
+    return nodePoint;
+  }
 }
 </script>
 
@@ -143,7 +153,7 @@ const placeNode = (nodeId: number) => {
   flex-direction: column;
   align-items: center;
   height: 100vh;
-  width: 100vw;
+  width: max-content;
   justify-content: center;
 }
 
@@ -158,6 +168,7 @@ const placeNode = (nodeId: number) => {
 .tree-level {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-around;
+  gap: 1em;
 }
 </style>
