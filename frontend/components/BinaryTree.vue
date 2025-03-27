@@ -36,7 +36,9 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits(['selectNode']);
-const connections = ref<Connection[]>([]);
+const connections = ref<Connection[]>();
+
+const nodeMapping = new Map<Node, string>([]);
 
 let resizeObserver: ResizeObserver;
 let mutationObserver:  MutationObserver;
@@ -123,10 +125,15 @@ const recalculateNodeCoordinates = () => {
   }));
 };
 
-const placeNodes = (parentId: number) => {
-  let parentNode = props.structuredTree.find(n => n.nodeId === parentId);
-
+const placeNode = (nodeId: number) => {
+  let node = props.structuredTree.find(n => n.nodeId === nodeId);
   
+  if (node?.nodeId === 0) {
+    nodeMapping.set(node,'0em');
+  };
+  
+  let parentNode = props.structuredTree.find(n => n.nodeId === node?.parentId);
+  let nodePosition = 
 }
 </script>
 
