@@ -6,13 +6,11 @@
 
     <div id="tree-composition" v-if="structuredTree.length">
       <div class="tree-level" v-for="(level, index) in treeLevels" :key="`${index}`">
-        <ExistingNode v-for="node in level" 
-          :key="`${node.nodeId}`" 
-          :node="node" 
-          @click="handleNodeSelection(node)" 
-          :style="{
-            left: `${placeNode(node.nodeId)}%`
-          }"
+        <ExistingNode v-for="node in level"
+          :key="`${node.nodeId}`"
+          :node="node"
+          @click="handleNodeSelection(node)"
+          :style="placeNode(node.nodeId)"
         />
       </div>
     </div>
@@ -30,7 +28,7 @@ import {BlankNode, ExistingNode, VisualConnection} from '#components';
 import type {Node} from '~/types/Node';
 import type {Connection} from '~/types/Connection';
 
-const props = defineProps<{ 
+const props = defineProps<{
   structuredTree: Node[],
   treeLevels: Node[][]
 }>();
@@ -38,7 +36,7 @@ const props = defineProps<{
 const emit = defineEmits(['selectNode']);
 const connections = ref<Connection[]>([]);
 
-const nodeMapping = new Map<number, number>([]);
+const nodePositions = new Map<number, { x: number, y: number }>();
 
 let resizeObserver: ResizeObserver;
 let mutationObserver:  MutationObserver;
@@ -77,6 +75,7 @@ onBeforeUnmount(() => {
 });
 
 watch(props.structuredTree, (updatedTree) => {
+  placeNodes();
   connectNodes(updatedTree);
 });
 
@@ -110,7 +109,7 @@ const connect = (parentId: number, childId: number) => {
 
 const getNodeCoordinates = (nodeId: number) => {
   const rect = document.getElementById(nodeId.toString())?.getBoundingClientRect();
-  return { 
+  return {
     x: (rect?.left ?? 0) + (rect?.width ?? 0) / 2,
     y: (rect?.top ?? 0) + (rect?.height ?? 0) / 2
   }
@@ -124,27 +123,37 @@ const recalculateNodeCoordinates = () => {
   }));
 };
 
-const placeNode = (nodeId: number) => {
-  let node = props.structuredTree.find(n => n.nodeId === nodeId);
+const placeNodes = () => {
+  if (!props.structuredTree.length) return;
 
-  if (node) {
-    console.log(node);
-    if (node.parentId === null) {
-      let rootPosition = 50;
+  const root = props.structuredTree.find(n => n.parentId === null);
+  if (!root) return;
 
-      nodeMapping.set(nodeId, rootPosition);
-      return rootPosition;
+  const spacingX = 100;
+  const spacingY = 120;
+
+  const assignPositions = (node: Node, x: number, y: number) => {
+    nodePositions.set(node.nodeId, { x, y });
+
+    const leftChild = props.structuredTree.find(n => n.parentId === node.nodeId && n.position === 'L');
+    const rightChild = props.structuredTree.find(n => n.parentId === node.nodeId && n.position === 'R');
+
+    if (leftChild) {
+      assignPositions(leftChild, x - spacingX / (y / spacingY + 1), y + spacingY);
     }
+    if (rightChild) {
+      assignPositions(rightChild, x + spacingX / (y / spacingY + 1), y + spacingY);
+    }
+  };
 
-    let parentPoint = nodeMapping.get(node.parentId);
-    console.log(parentPoint);
-    let nodePoint = (parentPoint !== undefined) ? (node.position === 'L' ? parentPoint - (parentPoint/2) : parentPoint + (parentPoint/2)) : 0;
-    nodeMapping.set(nodeId, nodePoint);
+  assignPositions(root, 50, 0);
+};
 
-    console.log(nodePoint);
-    return nodePoint;
-  }
-}
+const placeNode = (nodeId: number) => {
+  const pos = nodePositions.get(nodeId);
+  return pos ? `left: ${pos.x}%; top: ${pos.y}px;` : '';
+};
+
 </script>
 
 <style scoped>
@@ -153,7 +162,7 @@ const placeNode = (nodeId: number) => {
   flex-direction: column;
   align-items: center;
   height: 100vh;
-  width: max-content;
+  width: 100%;
   justify-content: center;
 }
 
@@ -168,7 +177,7 @@ const placeNode = (nodeId: number) => {
 .tree-level {
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  justify-content: center;
   gap: 1em;
 }
 </style>
