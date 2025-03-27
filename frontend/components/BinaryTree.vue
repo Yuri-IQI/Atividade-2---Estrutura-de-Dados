@@ -4,8 +4,17 @@
       <BlankNode :nodeId="0" :parentId="null" :position="null" @selectNode="handleNodeSelection" />
     </div>
 
-    <div class="tree-level" v-for="(level, index) in treeLevels" :key="index">
-      <ExistingNode v-for="node in level" :key="node.nodeId" :node="node" @click="handleNodeSelection(node)" />
+    <div id="tree-composition" v-if="structuredTree.length">
+      <div class="tree-level" v-for="(level, index) in treeLevels" :key="`${index}`">
+        <ExistingNode v-for="node in level" 
+          :key="`${node.nodeId}`" 
+          :node="node" 
+          @click="handleNodeSelection(node)" 
+          :style="{
+            left: node.position ? (node.position === 'L' ? '-3em' : '3em') : '0em'
+          }"
+        />
+      </div>
     </div>
 
     <VisualConnection
@@ -25,8 +34,12 @@ const props = defineProps<{
   structuredTree: Node[],
   treeLevels: Node[][]
 }>();
+
 const emit = defineEmits(['selectNode']);
 const connections = ref<Connection[]>([]);
+
+let resizeObserver: ResizeObserver;
+let mutationObserver:  MutationObserver;
 
 const handleNodeSelection = (node?: Node) => {
   if (!node) {
@@ -37,15 +50,50 @@ const handleNodeSelection = (node?: Node) => {
 };
 
 onMounted(() => {
-  props.structuredTree.forEach(node => {
-    if (node.parentId !== null) {
-      connect(node.parentId, node.nodeId);
-      console.log('hfsd')
-    }
+  resizeObserver = new ResizeObserver(() => {
+    recalculateNodeCoordinates();
   });
 
+  mutationObserver = new MutationObserver(() => {
+    recalculateNodeCoordinates();
+  });
+
+  props.structuredTree.forEach(node => {
+    const element = document.getElementById(node.nodeId.toString());
+    if (element) {
+      resizeObserver.observe(element);
+      mutationObserver.observe(element, { attributes: true, childList: true, subtree: true });
+    }
+  });
   console.log(props.structuredTree);
+  window.addEventListener('resize', recalculateNodeCoordinates);
 });
+
+onBeforeUnmount(() => {
+  resizeObserver?.disconnect();
+  mutationObserver?.disconnect();
+  window.removeEventListener('resize', recalculateNodeCoordinates);
+});
+
+watch(props.structuredTree, (updatedTree) => {
+  connectNodes(updatedTree);
+});
+
+watchEffect(async () => {
+  if (props.structuredTree.length > 0) {
+    await nextTick();
+    connectNodes(props.structuredTree);
+  }
+});
+
+const connectNodes = (tree: Node[]) => {
+  document.querySelectorAll('.connection-line').forEach(el => el.remove())
+  tree.forEach(node => {
+    if (node.parentId !== null) {
+      connect(node.parentId, node.nodeId);
+    }
+  });
+};
 
 const connect = (parentId: number, childId: number) => {
   let connection: Connection = {
@@ -66,6 +114,20 @@ const getNodeCoordinates = (nodeId: number) => {
     y: (rect?.top ?? 0) + (rect?.height ?? 0) / 2
   }
 }
+
+const recalculateNodeCoordinates = () => {
+  connections.value = connections.value.map(connection => ({
+    ...connection,
+    parentCoordinates: getNodeCoordinates(connection.parentId),
+    childCoordinates: getNodeCoordinates(connection.childId),
+  }));
+};
+
+const placeNodes = (parentId: number) => {
+  let parentNode = props.structuredTree.find(n => n.nodeId === parentId);
+
+  
+}
 </script>
 
 <style scoped>
@@ -75,19 +137,20 @@ const getNodeCoordinates = (nodeId: number) => {
   align-items: center;
   height: 100vh;
   width: 100vw;
+  justify-content: center;
+}
+
+#tree-composition {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  height: 100%;
+  width: 100%;
 }
 
 .tree-level {
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
-  width: 24em;
-}
-
-.blank-spots {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-around;
+  justify-content: center;
 }
 </style>

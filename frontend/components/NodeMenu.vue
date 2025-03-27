@@ -1,15 +1,15 @@
 <template>
   <div class="nodeMenu">
-    <span>{{ `ID do Nó: ${node.nodeId}` }}</span>
-    <div>
+    <span>{{ `${node.nodeId}` }}</span>
+    <div id="value">
       <label for="node-value">Valor do Nó:</label>
       <input id="node-value" v-model="nodeValue" placeholder="Valor do Nó" />
-      <button @click="setNodeValue(node)" :disabled="!nodeValue.trim()">{{ nodeType === NodeTypeEnum.BLANK ? 'Criar Nó' : 'Atualizar Nó' }}</button>
     </div>
+    <button @click="setNodeValue(node)" :disabled="!nodeValue.trim()">{{ nodeType === NodeTypeEnum.BLANK ? 'Criar Nó' : 'Atualizar Nó' }}</button>
   </div>
   <div class="nodeMenu" v-if="nodeType === NodeTypeEnum.ACTIVE">
-    <span>{{ `Nó Filho: ${node.rightId && node.leftId ? node.leftId + ', ' + node.rightId : (node.rightId ? node.rightId : (node.leftId ? node.leftId : '')) }` }}</span>
-    <div v-if="!node.rightId || !node.leftId">
+    <span>{{ `Filhos: ${node.rightId && node.leftId ? node.leftId + ', ' + node.rightId : (node.rightId ? node.rightId : (node.leftId ? node.leftId : '')) }` }}</span>
+    <div id="child-inputs" v-if="!node.rightId || !node.leftId">
       <label for="child">Valor do Filho: </label>
       <input id="child" v-model="childValue" placeholder="Valor do Filho" />
       <div id="buttons">
@@ -56,6 +56,7 @@ const getChildId = () => {
 };
 
 const createChild = () => {
+  console.log(childPosition.value)
   const node: Node = {
     nodeId: getChildId(),
     nodeValue: childValue.value,
@@ -83,22 +84,40 @@ const createNode = async (node: Node) => {
       position: node.position
     };
 
+    console.log(nodeRequest);
     const { data } = await axios.post('http://localhost:4500/insert', nodeRequest);
     emit('updateNodeTree', data.tree);
   } catch (error) {
     console.error('Error creating node:', error);
   }
 };
+
+watch(() => props.node, (newNode) => {
+  nodeValue.value = newNode.nodeValue;
+  childValue.value = '';
+  childPosition.value = newNode.leftId ? 'L' : 'R';
+});
 </script>
 
 <style scoped>
 .nodeMenu {
-  padding: 10px;
+  padding: 0.4em;
   background-color: #f0f0f0;
   border: 1px solid #ccc;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
+  gap: 0.4em;
+}
+
+#value {
+  display: flex;
+  gap: 0.4em;
+}
+
+#buttons {
+  display: flex;
+  justify-content: space-between;
+  margin: 0.2em;
 }
 </style>

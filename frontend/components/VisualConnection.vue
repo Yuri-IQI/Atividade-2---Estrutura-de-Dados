@@ -1,14 +1,16 @@
 <template>
-    <svg class="connection-line" :style="lineStyle" >
-        <line
-            :x1="start.x"
-            :y1="start.y"
-            :x2="end.x"
-            :y2="end.y"
-            stroke="black"
-            stroke-width="2"
-        />
-    </svg>
+    <div id="connections">
+        <svg class="connection-line" :key="`${connection.parentId}-${connection.childId}`" :style="lineStyle" >
+            <line
+                :x1="start.x"
+                :y1="start.y"
+                :x2="end.x"
+                :y2="end.y"
+                stroke="black"
+                stroke-width="2"
+            />
+        </svg>
+    </div>
 </template>
   
 <script setup lang="ts">
@@ -19,8 +21,6 @@ const props = defineProps<{ connection: Connection }>();
 
 const start = computed(() => props.connection.parentCoordinates);
 const end = computed(() => props.connection.childCoordinates);
-
-console.log('hui')
 
 const lineStyle = computed(() => ({
     position: 'absolute',

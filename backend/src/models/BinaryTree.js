@@ -32,8 +32,8 @@ class BinaryTree {
         return structuredTree;
     }    
 
-    createNode(id, value, parentId) {
-        return new TreeNode(id, value, parentId);
+    createNode(id, value, parentId, position) {
+        return new TreeNode(id, value, parentId, position);
     }
 
     verifyNodeRepetition(value) {
@@ -75,7 +75,7 @@ class BinaryTree {
             return true;
         }
     
-        const newNode = this.createNode(id, value, parentNode.id);
+        const newNode = this.createNode(id, value, parentNode.id, position);
         this.associateWithParent(newNode, parentNode, position);
         this.treeNodes.push(newNode);
         

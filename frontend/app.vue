@@ -1,17 +1,17 @@
 <template>
   <div id="all">
     <BinaryTree
-        :structuredTree="structuredTree"
-        :treeLevels="treeLevels"
-        @selectNode="getSelectedNode"
+      :structuredTree="structuredTree"
+      :treeLevels="treeLevels"
+      @selectNode="getSelectedNode"
     />
     <aside>
       <NodeMenu
-          v-if="selectedNode !== null"
-          :node="selectedNode"
-          :nodeType="checkNodeInsertion(selectedNode.nodeId)"
-          :structured-tree="structuredTree"
-          @updateNodeTree="updateNodeTree"
+        v-if="selectedNode !== null"
+        :node="selectedNode"
+        :nodeType="checkNodeInsertion(selectedNode.nodeId)"
+        :structured-tree="structuredTree"
+        @updateNodeTree="updateNodeTree"
       />
     </aside>
   </div>
@@ -32,6 +32,7 @@ const treeLevels = ref<Node[][]>([]);
 onMounted(async () => {
   const treeData = await useConsumer();
   structuredTree.value = treeData.structuredTree?.value ?? [];
+  console.log(structuredTree.value);
   assignTreeLevels();
 });
 
@@ -71,6 +72,8 @@ const getSelectedNode = (node: Node) => {
 
 const updateNodeTree = (nodeTree: Node[]) => {
   structuredTree.value = nodeTree;
+  console.log(nodeTree);
+  assignTreeLevels();
 }
 
 const checkNodeInsertion = (nodeId: number): NodeTypeEnum => {

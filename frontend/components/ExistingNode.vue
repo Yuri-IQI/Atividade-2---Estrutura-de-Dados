@@ -1,8 +1,8 @@
 <template>
     <div class="existing-node" :id="node.nodeId.toString()">
-        <span>
+        <h2>
             {{ props.node.nodeId }}
-        </span>
+        </h2>
     </div>
 </template>
 
@@ -16,19 +16,17 @@ const props = defineProps<{
 
 <style scoped>
 .existing-node {
+    position: relative;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 9999;
 
     width: 4em;
     height: 4em;
     border: 0.4em solid black;
     border-radius: 50%;
     background-color: rgb(175, 171, 171);
-}
-
-span {
-    z-index: 1;
 }
 </style>
