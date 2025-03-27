@@ -10,6 +10,7 @@
           v-if="selectedNode !== null"
           :node="selectedNode"
           :nodeType="checkNodeInsertion(selectedNode.nodeId)"
+          :structured-tree="structuredTree"
           @updateNodeTree="updateNodeTree"
       />
     </aside>
@@ -32,7 +33,6 @@ onMounted(async () => {
   const treeData = await useConsumer();
   structuredTree.value = treeData.structuredTree?.value ?? [];
   assignTreeLevels();
-  console.log(treeLevels.value);
 });
 
 const assignTreeLevels = () => {

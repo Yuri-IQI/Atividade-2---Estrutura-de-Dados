@@ -1,11 +1,9 @@
 <template>
-    <div @click="insertNewNode" class="blank-node" tabindex="0">
-    </div>
+  <div @click="insertNewNode" class="blank-node" tabindex="0"></div>
 </template>
 
-<script setup lang="tsx">
+<script setup lang="ts">
 import type { Node } from '~/types/Node';
-
 
 const props = defineProps<{ 
   nodeId: number,
@@ -13,7 +11,6 @@ const props = defineProps<{
   position: string | null
 }>();
 const emit = defineEmits(['selectNode']);
-console.log(props.parentId);
 
 const insertNewNode = () => {
   const node: Node = {
@@ -24,8 +21,7 @@ const insertNewNode = () => {
     rightId: null,
     degree: null,
     position: props.position
-  }
-
+  };
   emit('selectNode', node);
 };
 </script>

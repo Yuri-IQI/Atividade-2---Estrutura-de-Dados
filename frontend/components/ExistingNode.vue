@@ -1,13 +1,7 @@
 <template>
-    <div class="a">
-        <div class="existing-node">
-            <span>
-                {{ props.node.nodeId }}
-            </span>
-        </div>
-        <span class="b">
-            <p>a</p>
-            <p>b</p>
+    <div class="existing-node" :id="node.nodeId.toString()">
+        <span>
+            {{ props.node.nodeId }}
         </span>
     </div>
 </template>
@@ -31,9 +25,10 @@ const props = defineProps<{
     height: 4em;
     border: 0.4em solid black;
     border-radius: 50%;
+    background-color: rgb(175, 171, 171);
 }
 
 span {
-    z-index: -1;
+    z-index: 1;
 }
 </style>
