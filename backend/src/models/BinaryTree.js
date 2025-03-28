@@ -5,32 +5,7 @@ class BinaryTree {
         this.treeNodes = [];
         this.root = null;
         this.nodeCounter = 0;
-    }
-
-    _assemblyLine(structuredTree, node) {
-        if (!node) return;
-    
-        structuredTree.push(node);
-    
-        if (node.leftId) {
-            let leftChild = this.findNodeById(node.leftId);
-            this._assemblyLine(structuredTree, leftChild);
-        }
-    
-        if (node.rightId) {
-            let rightChild = this.findNodeById(node.rightId);
-            this._assemblyLine(structuredTree, rightChild);
-        }
-    }
-    
-    getStructuredTree() {
-        if (!this.root) return [];
-
-        let structuredTree = [];        
-        this._assemblyLine(structuredTree, this.root);
-    
-        return structuredTree;
-    }    
+    }   
 
     createNode(id, value, parentId, position) {
         return new TreeNode(id, value, parentId, position);
@@ -120,9 +95,7 @@ class BinaryTree {
         return 1 + this._getNodeDepth(parentNode);
     }
     
-    getNodeDepth(value) {
-        let node = this.findNodeByValue(value);
-    
+    getNodeDepth(node) {    
         if (!node) {
             return -1;
         }
@@ -157,19 +130,19 @@ class BinaryTree {
     
         if (leafNodes.length === 0) return 0;
     
-        return Math.max(...leafNodes.map(leaf => this.getNodeDepth(leaf.value)));
+        return Math.max(leafNodes.map(leaf => this.getNodeDepth(leaf)));
     }    
 
     getTreeInfo() {
         let treeDegree = this.getTreeDegree();
         let treeHeight = this.getTreeHeight();
-        let treeleaves = this.getLeafNodes();
+        let treeLeaves = this.getLeafNodes();
 
         return {
             treeDegree: treeDegree,
             treeHeight: treeHeight,
             treeLevel: treeHeight,
-            treeleaves: treeleaves
+            treeLeaves: treeLeaves
         }
     }
 

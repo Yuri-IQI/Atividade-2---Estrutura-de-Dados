@@ -7,7 +7,7 @@
                 :x2="end.x"
                 :y2="end.y"
                 stroke="black"
-                stroke-width="2"
+                stroke-width="4"
             />
         </svg>
     </div>

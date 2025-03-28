@@ -1,10 +1,10 @@
 import { useAsyncData } from '#app';
 import axios from 'axios';
-import type { Node } from '~/types/TreeNode';
+import type { TreeNode } from '~/types/TreeNode';
 import type { TreeInfo } from '~/types/TreeInfo';
 
 export const useConsumer = async () => {
-    const { data: structuredTree, error: structuredTreeError } = await useAsyncData<Node[]>('structuredTree', async () => {
+    const { data: structuredTree, error: structuredTreeError } = await useAsyncData<TreeNode[]>('structuredTree', async () => {
         try {
             const response = await axios.get('http://localhost:4500/structured-tree');
             return response.data;

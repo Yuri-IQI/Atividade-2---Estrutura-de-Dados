@@ -1,20 +1,46 @@
 <template>
-    <div class="existing-node" :id="node.nodeId.toString()">
-        <h2>
-            {{ props.node.nodeId }}
-        </h2>
+    <div class="tooltip-container">
+        <div class="existing-node" :id="node.nodeId.toString()" @mouseover="showTooltip = true" @mouseleave="showTooltip = false">
+            <h2>
+                {{ props.node.nodeId }}
+            </h2>
+        </div>
+        <div v-if="showTooltip" class="tooltip">{{ node.nodeValue }}</div>
     </div>
 </template>
 
 <script setup lang="tsx">
 import type { TreeNode } from '~/types/TreeNode';
 
+const showTooltip = ref(false);
 const props = defineProps<{
     node: TreeNode
 }>();
 </script>
 
 <style scoped>
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: black;
+  color: white;
+  padding: 6px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+  white-space: nowrap;
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.2s;
+}
+
 .existing-node {
     position: relative;
     cursor: pointer;

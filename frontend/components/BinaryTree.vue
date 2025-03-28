@@ -7,24 +7,29 @@
       @selectNode="selectNode"
     />
 
-    <div id="tree-composition" v-if="structuredTree.length">
-      <div class="tree-level" v-for="(level, index) in treeLevels" :key="index">
+  <div id="tree-composition" v-if="structuredTree.length">
+    <div class="tree-level" v-for="(level, index) in treeLevels" :key="index">
+      <template v-if="level[0].parentNode === null">
         <RootTreeFamily
-          v-if="index === 0"
-          :parent="treeLevels[0][0].parentNode"
+          :family="level[0]"
+          :root="structuredTree.find(n => n.nodeId === 0) ?? null"
           @selectNode="selectNode"
         />
+      </template>
 
+      <template v-else>
         <NodeFamily
           v-for="family in level"
-          :key="family.parentNode?.nodeId"
+          :key="family.parentNode?.nodeId || `family-${index}`"
           :parent="family.parentNode"
           :left="family.leftNode"
           :right="family.rightNode"
           @selectNode="selectNode"
         />
-      </div>
+      </template>
+
     </div>
+  </div>
 
     <VisualConnection
       v-for="connection in connections"
@@ -47,49 +52,32 @@ const props = defineProps<{
 const emit = defineEmits(['selectNode']);
 const connections = ref<Connection[]>([]);
 
-let resizeObserver: ResizeObserver;
-let mutationObserver: MutationObserver;
-
 const selectNode = (node: TreeNode) => {
   if (!node) return;
   emit('selectNode', node);
 }
 
-onMounted(() => {
-  resizeObserver = new ResizeObserver(() => {
-    recalculateNodeCoordinates();
-  });
-
-  mutationObserver = new MutationObserver(() => {
-    recalculateNodeCoordinates();
-  });
-
-  props.structuredTree.forEach(node => {
-    const element = document.getElementById(node.nodeId.toString());
-    if (element) {
-      resizeObserver.observe(element);
-      mutationObserver.observe(element, { attributes: true, childList: true, subtree: true });
-    }
-  });
-  window.addEventListener('resize', recalculateNodeCoordinates);
-  console.log(props.treeLevels);
-});
+let resizeObserver: ResizeObserver | null = null;
 
 watchEffect(async () => {
   if (props.structuredTree.length > 0) {
     await nextTick();
-    connectNodes(props.structuredTree);
+    if (connections.value.length === 0) {
+      recalculateNodeCoordinates();
+      connectNodes(props.structuredTree);
+    }
   }
-})
+});
 
 const connectNodes = (tree: TreeNode[]) => {
-  document.querySelectorAll('.connection-line').forEach(el => el.remove())
-  tree.forEach(node => {
-    if (node.parentId !== null) {
-      connect(node.parentId, node.nodeId);
-    }
-  })
-}
+  if (connections.value.length === 0) { 
+    tree.forEach(node => {
+      if (node.parentId !== null) {
+        connect(node.parentId, node.nodeId);
+      }
+    });
+  }
+};
 
 const connect = (parentId: number, childId: number) => {
   let connection: Connection = {
@@ -98,26 +86,45 @@ const connect = (parentId: number, childId: number) => {
     parentCoordinates: getComputedNodeCoordinates(parentId),
     childCoordinates: getComputedNodeCoordinates(childId),
     connectionSide: props.structuredTree.find(n => n.nodeId === parentId)?.leftId === childId ? 'L' : 'R'
-  }
+  };
 
   connections.value.push(connection);
-}
+};
 
 const getComputedNodeCoordinates = (nodeId: number) => {
-  const rect = document.getElementById(nodeId.toString())?.getBoundingClientRect();
+  const element = document.getElementById(nodeId.toString());
+  if (!element) return { x: 0, y: 0 };
+  
+  const rect = element.getBoundingClientRect();
   return {
-    x: (rect?.left ?? 0) + (rect?.width ?? 0) / 2,
-    y: (rect?.top ?? 0) + (rect?.height ?? 0) / 2
-  }
-}
+    x: rect.left + window.scrollX + rect.width / 2,
+    y: rect.top + window.scrollY + rect.height / 2
+  };
+};
 
 const recalculateNodeCoordinates = () => {
-  connections.value = connections.value?.map(connection => ({
+  connections.value = connections.value.map(connection => ({
     ...connection,
     parentCoordinates: getComputedNodeCoordinates(connection.parentId),
     childCoordinates: getComputedNodeCoordinates(connection.childId),
   }));
 };
+
+onMounted(() => {
+  const treeContainer = document.getElementById('tree-composition');
+  if (treeContainer) {
+    resizeObserver = new ResizeObserver(() => {
+      recalculateNodeCoordinates();
+    });
+    resizeObserver.observe(treeContainer);
+  }
+});
+
+onUnmounted(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect();
+  }
+});
 </script>
 
 <style scoped>

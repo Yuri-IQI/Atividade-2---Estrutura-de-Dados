@@ -1,15 +1,6 @@
 <template>
-    <div id="root-family">
-        <div id="root-node">
-            <ExistingNode
-                v-if="parent"
-                :key="parent.nodeId"
-                :node="parent"
-                @click="selectNode(parent)"
-            />
-        </div>
-
-        <div class="node-group">
+    <div class="root-family">
+        <div class="node-group" :class="{'force-right': !left, 'force-left': !right, 'center': left && right}">
             <div class="left-node" v-if="left">
                 <ExistingNode
                     :key="left.nodeId"
@@ -44,7 +35,7 @@ const selectNode = (node: TreeNode | null) => {
 </script>
   
 <style scoped>
-#root-family {
+.root-family {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -53,9 +44,22 @@ const selectNode = (node: TreeNode | null) => {
 .node-group {
     display: flex;
     gap: 1em;
+    width: 10em;
 }
   
 .left-node, .right-node {
     display: flex;
+}
+
+.force-left {
+    justify-content: flex-start;
+}
+
+.force-right {
+    justify-content: flex-end;
+}
+
+.center {
+    justify-content: center;
 }
 </style>  

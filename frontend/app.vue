@@ -1,6 +1,12 @@
 <template>
   <div id="all">
+    <aside id="info-menu">
+      <InformationMenu 
+        :key="structuredTree.length"
+      />
+    </aside>
     <BinaryTree
+      :key="selectedNode?.nodeId"
       :structuredTree="structuredTree"
       :treeLevels="treeLevels"
       @selectNode="getSelectedNode"
@@ -36,21 +42,28 @@ onMounted(async () => {
   assignTreeLevels();
 });
 
-
 const assignTreeLevels = () => {
   treeLevels.value = [];
 
   const rootNode = structuredTree.value.find(node => node.nodeId === 0);
   if (!rootNode) return;
 
-  const rootFamily: NodeFamily = createNodeFamily(rootNode);
+  const rootFamily = createRootFamily(rootNode);
   treeLevels.value.push([rootFamily]);
 
   structuredTree.value.forEach(node => {
-    let parentLevelIndex = treeLevels.value.findIndex(level =>
-      level.some(fam =>
-        fam.leftNode?.nodeId === node.nodeId || fam.rightNode?.nodeId === node.nodeId
-      )
+    if (node.nodeId === 0) return;
+
+    const parentLevelIndex = treeLevels.value.findIndex(level =>
+      level.some(family => {
+        const parent = family.parentNode;
+
+        if (!parent && node.parentId === 0) {
+          return family.leftNode?.nodeId === node.nodeId || family.rightNode?.nodeId === node.nodeId;
+        }
+
+        return (family.leftNode?.nodeId === node.parentId || family.rightNode?.nodeId === node.parentId) && family.parentNode !== null;
+      })
     );
 
     if (parentLevelIndex !== -1) {
@@ -60,42 +73,37 @@ const assignTreeLevels = () => {
         treeLevels.value[nextLevelIndex] = [];
       }
 
-      let existingNodeFamily = treeLevels.value[nextLevelIndex].find(fam => {
-  if (node.position === 'L') {
-    return fam.rightNode?.parentId === node.parentId;
-  }
-  if (node.position === 'R') {
-    return fam.leftNode?.parentId === node.parentId;
-  }
-  return false;
-});
-      console.log('nivel', nextLevelIndex, treeLevels.value[nextLevelIndex])
-
-      console.log(existingNodeFamily);
-
-      if (existingNodeFamily) {
+      let existingFamily = treeLevels.value[nextLevelIndex].find(family =>
+        family.parentNode?.nodeId === node.parentId
+      );
+      if (existingFamily) {
         if (node.position === 'L') {
-          existingNodeFamily.leftNode = node;
+          existingFamily.leftNode = node;
         } else {
-          existingNodeFamily.rightNode = node;
+          existingFamily.rightNode = node;
         }
       } else {
         const newFamily = createNodeFamily(node);
         treeLevels.value[nextLevelIndex].push(newFamily);
+        console.log(treeLevels.value)
       }
     }
   });
 };
 
-const createNodeFamily = (parentNode: TreeNode): NodeFamily => {
-  let leftNode = structuredTree.value.find(n => n.nodeId === parentNode.leftId) || null;
-  let rightNode = structuredTree.value.find(n => n.nodeId === parentNode.rightId) || null;
-  let parent = parentNode.nodeId === 0 ? null : parentNode;
-
+const createRootFamily = (root: TreeNode): NodeFamily => {
   return {
-    parentNode: parent,
-    leftNode,
-    rightNode
+    parentNode: null,
+    leftNode: structuredTree.value.find(n => n.nodeId === root.leftId) || null,
+    rightNode: structuredTree.value.find(n => n.nodeId === root.rightId) || null,
+  };
+};
+
+const createNodeFamily = (node: TreeNode): NodeFamily => {
+  return {
+    parentNode: structuredTree.value.find(n => n.nodeId === node.parentId) || null,
+    leftNode: node.position === 'L' ? node : null,
+    rightNode: node.position === 'R' ? node : null,
   };
 };
 
@@ -123,14 +131,14 @@ const checkNodeInsertion = (nodeId: number): NodeTypeEnum => {
 <style>
 #all {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
 }
 
-aside {
+#info-menu {
   position: absolute;
   top: 0;
-  right: 0;
+  left: 0;
 }
 </style>

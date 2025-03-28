@@ -8,7 +8,10 @@
     <button @click="setNodeValue(node)" :disabled="!nodeValue.trim()">{{ nodeType === NodeTypeEnum.BLANK ? 'Criar Nó' : 'Atualizar Nó' }}</button>
   </div>
   <div class="nodeMenu" v-if="nodeType === NodeTypeEnum.ACTIVE">
-    <span>{{ `Filhos: ${node.rightId && node.leftId ? node.leftId + ', ' + node.rightId : (node.rightId ? node.rightId : (node.leftId ? node.leftId : '')) }` }}</span>
+    <span>
+      <p v-if="node.leftId">{{ 'Esquerda: ' + node.leftId }}</p>
+      <p v-if="node.rightId">{{ 'Direita: ' + node.rightId }}</p>
+    </span>
     <div id="child-inputs" v-if="!node.rightId || !node.leftId">
       <label for="child">Valor do Filho: </label>
       <input id="child" v-model="childValue" placeholder="Valor do Filho" />
