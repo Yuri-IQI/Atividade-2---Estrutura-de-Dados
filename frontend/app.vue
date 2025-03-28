@@ -61,9 +61,14 @@ const assignTreeLevels = () => {
       }
 
       let existingNodeFamily = treeLevels.value[nextLevelIndex].find(fam => {
-        if (node.position === 'L') fam.rightNode?.parentId === node.parentId;
-        if (node.position === 'R') fam.leftNode?.parentId === node.parentId;
-      });
+  if (node.position === 'L') {
+    return fam.rightNode?.parentId === node.parentId;
+  }
+  if (node.position === 'R') {
+    return fam.leftNode?.parentId === node.parentId;
+  }
+  return false;
+});
       console.log('nivel', nextLevelIndex, treeLevels.value[nextLevelIndex])
 
       console.log(existingNodeFamily);
