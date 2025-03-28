@@ -1,4 +1,4 @@
-import type { Node } from "./Node";
+import type { TreeNode } from "./TreeNode";
 
 export interface TreeInfo {
     treeDegree: number,

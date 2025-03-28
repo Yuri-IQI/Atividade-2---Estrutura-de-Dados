@@ -23,18 +23,19 @@ import { useConsumer } from '~/composables/useConsumer';
 import NodeMenu from "~/components/NodeMenu.vue";
 import {ref} from "vue";
 import {NodeTypeEnum} from "~/types/NodeTypeEnum";
-import type { Node } from './types/Node';
+import type { TreeNode } from './types/TreeNode';
+import type { NodeFamily } from './types/NodeFamily';
 
-const structuredTree = ref<Node[]>([]);
-const selectedNode = ref<Node | null>(null);
-const treeLevels = ref<Node[][]>([]);
+const structuredTree = ref<TreeNode[]>([]);
+const selectedNode = ref<TreeNode | null>(null);
+const treeLevels = ref<NodeFamily[][]>([]);
 
 onMounted(async () => {
   const treeData = await useConsumer();
   structuredTree.value = treeData.structuredTree?.value ?? [];
-  console.log(structuredTree.value);
   assignTreeLevels();
 });
+
 
 const assignTreeLevels = () => {
   treeLevels.value = [];
@@ -42,26 +43,58 @@ const assignTreeLevels = () => {
   const rootNode = structuredTree.value.find(node => node.nodeId === 0);
   if (!rootNode) return;
 
-  treeLevels.value.push([rootNode]);
+  const rootFamily: NodeFamily = createNodeFamily(rootNode);
+  treeLevels.value.push([rootFamily]);
 
   structuredTree.value.forEach(node => {
-    if (node.nodeId === 0) return;
-
-    let parentLevelIndex = treeLevels.value.findIndex(level => 
-      level.some(parent => parent.nodeId === node.parentId)
+    let parentLevelIndex = treeLevels.value.findIndex(level =>
+      level.some(fam =>
+        fam.leftNode?.nodeId === node.nodeId || fam.rightNode?.nodeId === node.nodeId
+      )
     );
 
     if (parentLevelIndex !== -1) {
       const nextLevelIndex = parentLevelIndex + 1;
+
       if (!treeLevels.value[nextLevelIndex]) {
         treeLevels.value[nextLevelIndex] = [];
       }
-      treeLevels.value[nextLevelIndex].push(node);
+
+      let existingNodeFamily = treeLevels.value[nextLevelIndex].find(fam => {
+        if (node.position === 'L') fam.rightNode?.parentId === node.parentId;
+        if (node.position === 'R') fam.leftNode?.parentId === node.parentId;
+      });
+      console.log('nivel', nextLevelIndex, treeLevels.value[nextLevelIndex])
+
+      console.log(existingNodeFamily);
+
+      if (existingNodeFamily) {
+        if (node.position === 'L') {
+          existingNodeFamily.leftNode = node;
+        } else {
+          existingNodeFamily.rightNode = node;
+        }
+      } else {
+        const newFamily = createNodeFamily(node);
+        treeLevels.value[nextLevelIndex].push(newFamily);
+      }
     }
   });
-}
+};
 
-const getSelectedNode = (node: Node) => {
+const createNodeFamily = (parentNode: TreeNode): NodeFamily => {
+  let leftNode = structuredTree.value.find(n => n.nodeId === parentNode.leftId) || null;
+  let rightNode = structuredTree.value.find(n => n.nodeId === parentNode.rightId) || null;
+  let parent = parentNode.nodeId === 0 ? null : parentNode;
+
+  return {
+    parentNode: parent,
+    leftNode,
+    rightNode
+  };
+};
+
+const getSelectedNode = (node: TreeNode) => {
   if (selectedNode.value?.nodeId === node.nodeId) {
     selectedNode.value = null;
     return;
@@ -70,9 +103,8 @@ const getSelectedNode = (node: Node) => {
   selectedNode.value = node;
 };
 
-const updateNodeTree = (nodeTree: Node[]) => {
+const updateNodeTree = (nodeTree: TreeNode[]) => {
   structuredTree.value = nodeTree;
-  console.log(nodeTree);
   assignTreeLevels();
 }
 

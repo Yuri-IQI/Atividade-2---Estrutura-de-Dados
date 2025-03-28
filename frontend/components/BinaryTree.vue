@@ -1,16 +1,27 @@
 <template>
-  <main id="tree">
-    <div id="blank-root" v-if="structuredTree.length === 0">
-      <BlankNode :nodeId="0" :parentId="null" :position="null" @selectNode="handleNodeSelection" />
-    </div>
+  <div id="tree">
+    <BlankNode v-if="structuredTree.length === 0"
+      :node-id="0"
+      :parentId="null"
+      :position="null"
+      @selectNode="selectNode"
+    />
 
     <div id="tree-composition" v-if="structuredTree.length">
-      <div class="tree-level" v-for="(level, index) in treeLevels" :key="`${index}`">
-        <ExistingNode v-for="node in level"
-          :key="`${node.nodeId}`"
-          :node="node"
-          @click="handleNodeSelection(node)"
-          :style="placeNode(node.nodeId)"
+      <div class="tree-level" v-for="(level, index) in treeLevels" :key="index">
+        <RootTreeFamily
+          v-if="index === 0"
+          :parent="treeLevels[0][0].parentNode"
+          @selectNode="selectNode"
+        />
+
+        <NodeFamily
+          v-for="family in level"
+          :key="family.parentNode?.nodeId"
+          :parent="family.parentNode"
+          :left="family.leftNode"
+          :right="family.rightNode"
+          @selectNode="selectNode"
         />
       </div>
     </div>
@@ -20,34 +31,29 @@
       :key="`${connection.parentId}-${connection.childId}`"
       :connection="connection"
     />
-  </main>
+  </div>
 </template>
 
 <script setup lang="ts">
-import {BlankNode, ExistingNode, VisualConnection} from '#components';
-import type {Node} from '~/types/Node';
-import type {Connection} from '~/types/Connection';
+import type {Connection} from "~/types/Connection";
+import type {TreeNode} from "~/types/TreeNode"
+import type { NodeFamily } from "~/types/NodeFamily";
 
 const props = defineProps<{
-  structuredTree: Node[],
-  treeLevels: Node[][]
+  structuredTree: TreeNode[],
+  treeLevels: NodeFamily[][]
 }>();
 
 const emit = defineEmits(['selectNode']);
 const connections = ref<Connection[]>([]);
 
-const nodePositions = new Map<number, { x: number, y: number }>();
-
-const handleNodeSelection = (node?: Node) => {
-  if (!node) {
-    console.error("handleNodeSelection: Received undefined node");
-    return;
-  }
-  emit('selectNode', node);
-};
-
 let resizeObserver: ResizeObserver;
-let mutationObserver:  MutationObserver;
+let mutationObserver: MutationObserver;
+
+const selectNode = (node: TreeNode) => {
+  if (!node) return;
+  emit('selectNode', node);
+}
 
 onMounted(() => {
   resizeObserver = new ResizeObserver(() => {
@@ -66,17 +72,7 @@ onMounted(() => {
     }
   });
   window.addEventListener('resize', recalculateNodeCoordinates);
-});
-
-onBeforeUnmount(() => {
-  resizeObserver?.disconnect();
-  mutationObserver?.disconnect();
-  window.removeEventListener('resize', recalculateNodeCoordinates);
-});
-
-watch(props.structuredTree, (updatedTree) => {
-  placeNodes();
-  connectNodes(updatedTree);
+  console.log(props.treeLevels);
 });
 
 watchEffect(async () => {
@@ -84,30 +80,30 @@ watchEffect(async () => {
     await nextTick();
     connectNodes(props.structuredTree);
   }
-});
+})
 
-const connectNodes = (tree: Node[]) => {
+const connectNodes = (tree: TreeNode[]) => {
   document.querySelectorAll('.connection-line').forEach(el => el.remove())
   tree.forEach(node => {
     if (node.parentId !== null) {
       connect(node.parentId, node.nodeId);
     }
-  });
-};
+  })
+}
 
 const connect = (parentId: number, childId: number) => {
   let connection: Connection = {
     parentId: parentId,
     childId: childId,
-    parentCoordinates: getNodeCoordinates(parentId),
-    childCoordinates: getNodeCoordinates(childId),
+    parentCoordinates: getComputedNodeCoordinates(parentId),
+    childCoordinates: getComputedNodeCoordinates(childId),
     connectionSide: props.structuredTree.find(n => n.nodeId === parentId)?.leftId === childId ? 'L' : 'R'
   }
 
   connections.value.push(connection);
 }
 
-const getNodeCoordinates = (nodeId: number) => {
+const getComputedNodeCoordinates = (nodeId: number) => {
   const rect = document.getElementById(nodeId.toString())?.getBoundingClientRect();
   return {
     x: (rect?.left ?? 0) + (rect?.width ?? 0) / 2,
@@ -118,42 +114,10 @@ const getNodeCoordinates = (nodeId: number) => {
 const recalculateNodeCoordinates = () => {
   connections.value = connections.value?.map(connection => ({
     ...connection,
-    parentCoordinates: getNodeCoordinates(connection.parentId),
-    childCoordinates: getNodeCoordinates(connection.childId),
+    parentCoordinates: getComputedNodeCoordinates(connection.parentId),
+    childCoordinates: getComputedNodeCoordinates(connection.childId),
   }));
 };
-
-const placeNodes = () => {
-  if (!props.structuredTree.length) return;
-
-  const root = props.structuredTree.find(n => n.parentId === null);
-  if (!root) return;
-
-  const spacingX = 100;
-  const spacingY = 120;
-
-  const assignPositions = (node: Node, x: number, y: number) => {
-    nodePositions.set(node.nodeId, { x, y });
-
-    const leftChild = props.structuredTree.find(n => n.parentId === node.nodeId && n.position === 'L');
-    const rightChild = props.structuredTree.find(n => n.parentId === node.nodeId && n.position === 'R');
-
-    if (leftChild) {
-      assignPositions(leftChild, x - spacingX / (y / spacingY + 1), y + spacingY);
-    }
-    if (rightChild) {
-      assignPositions(rightChild, x + spacingX / (y / spacingY + 1), y + spacingY);
-    }
-  };
-
-  assignPositions(root, 50, 0);
-};
-
-const placeNode = (nodeId: number) => {
-  const pos = nodePositions.get(nodeId);
-  return pos ? `left: ${pos.x}%; top: ${pos.y}px;` : '';
-};
-
 </script>
 
 <style scoped>

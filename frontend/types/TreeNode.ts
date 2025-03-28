@@ -1,4 +1,4 @@
-export interface Node {
+export interface TreeNode {
     nodeId: number,
     nodeValue: any,
     leftId: number | null,

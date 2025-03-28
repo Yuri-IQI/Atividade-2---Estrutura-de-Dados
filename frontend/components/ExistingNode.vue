@@ -7,10 +7,10 @@
 </template>
 
 <script setup lang="tsx">
-import type { Node } from '~/types/Node';
+import type { TreeNode } from '~/types/TreeNode';
 
 const props = defineProps<{
-    node: Node
+    node: TreeNode
 }>();
 </script>
 

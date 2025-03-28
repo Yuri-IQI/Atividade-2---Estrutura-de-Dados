@@ -1,6 +1,6 @@
 import { useAsyncData } from '#app';
 import axios from 'axios';
-import type { Node } from '~/types/Node';
+import type { Node } from '~/types/TreeNode';
 import type { TreeInfo } from '~/types/TreeInfo';
 
 export const useConsumer = async () => {

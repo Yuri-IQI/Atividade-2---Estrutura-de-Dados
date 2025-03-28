@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Node } from '~/types/Node';
+import type { TreeNode } from '~/types/TreeNode';
 
 const props = defineProps<{ 
   nodeId: number,
@@ -13,7 +13,7 @@ const props = defineProps<{
 const emit = defineEmits(['selectNode']);
 
 const insertNewNode = () => {
-  const node: Node = {
+  const node: TreeNode = {
     nodeId: props.nodeId, 
     parentId: props.parentId,
     nodeValue: undefined,

@@ -27,12 +27,12 @@
 import axios from 'axios';
 import type { NodeRequest } from '~/types/NodeRequest';
 import { NodeTypeEnum } from '~/types/NodeTypeEnum';
-import type { Node } from "~/types/Node";
+import type { TreeNode } from "~/types/TreeNode";
 
 const props = defineProps<{ 
-  node: Node; 
+  node: TreeNode; 
   nodeType: NodeTypeEnum;
-  structuredTree: Node[] 
+  structuredTree: TreeNode[] 
 }>();
 const emit = defineEmits(['updateNodeTree']);
 
@@ -57,7 +57,7 @@ const getChildId = () => {
 
 const createChild = () => {
   console.log(childPosition.value)
-  const node: Node = {
+  const node: TreeNode = {
     nodeId: getChildId(),
     nodeValue: childValue.value,
     parentId: props.node.nodeId,
@@ -70,12 +70,12 @@ const createChild = () => {
   createNode(node);
 }
 
-const setNodeValue = (node: Node) => {
+const setNodeValue = (node: TreeNode) => {
   node.nodeValue = nodeValue.value;
   createNode(node);
 }
 
-const createNode = async (node: Node) => {
+const createNode = async (node: TreeNode) => {
   try {
     const nodeRequest: NodeRequest = {
       nodeId: node.nodeId,
