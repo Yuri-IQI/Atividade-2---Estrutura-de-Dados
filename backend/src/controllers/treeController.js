@@ -34,7 +34,7 @@ exports.insertNode = (req, res) => {
         return res.status(400).json({ error: "Nó inválido: apenas um único nó raiz permitido" });
     }
 
-    res.status(201).json({ message: "Nó inserido com sucesso", tree: tree.treeNodes });
+    res.status(201).json({ message: "Nó inserido com sucesso", tree: tree.doTraversal('PREORDER') });
 };
 
 

@@ -38,9 +38,6 @@ const connections = ref<Connection[]>([]);
 
 const nodePositions = new Map<number, { x: number, y: number }>();
 
-let resizeObserver: ResizeObserver;
-let mutationObserver:  MutationObserver;
-
 const handleNodeSelection = (node?: Node) => {
   if (!node) {
     console.error("handleNodeSelection: Received undefined node");
@@ -48,6 +45,9 @@ const handleNodeSelection = (node?: Node) => {
   }
   emit('selectNode', node);
 };
+
+let resizeObserver: ResizeObserver;
+let mutationObserver:  MutationObserver;
 
 onMounted(() => {
   resizeObserver = new ResizeObserver(() => {
