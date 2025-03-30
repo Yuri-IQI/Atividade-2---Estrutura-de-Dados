@@ -1,9 +1,9 @@
 <template>
   <div class="nodeMenu">
-    <span>{{ `${node.nodeId}` }}</span>
+    <span>Nó: {{ `${node.nodeId}` }}</span>
     <div id="value">
       <label for="node-value">Valor do Nó:</label>
-      <input id="node-value" v-model="nodeValue" placeholder="Valor do Nó" />
+      <input id="node-value" class="value-input" v-model="nodeValue" placeholder="Valor do Nó" />
     </div>
     <button @click="setNodeValue(node)" :disabled="!nodeValue.trim()">{{ nodeType === NodeTypeEnum.BLANK ? 'Criar Nó' : 'Atualizar Nó' }}</button>
   </div>
@@ -14,12 +14,15 @@
     </span>
     <div id="child-inputs" v-if="!node.rightId || !node.leftId">
       <label for="child">Valor do Filho: </label>
-      <input id="child" v-model="childValue" placeholder="Valor do Filho" />
+      <input id="child" class="value-input" v-model="childValue" placeholder="Valor do Filho" />
       <div id="buttons">
-        <span>
-          <button v-if="!node.leftId" @click="setPosition('L')">Esquerda</button>
-          <button v-if="!node.rightId" @click="setPosition('R')">Direita</button>
+        <span id="position">Posição: 
+          <span>
+            <button v-if="!node.leftId" @click="setPosition('L')">Esquerda</button>
+            <button v-if="!node.rightId" @click="setPosition('R')">Direita</button>
+          </span>
         </span>
+
         <button @click="createChild" :disabled="childValue === '' || childPosition === ''">Criar Filho</button>
       </div>
     </div>
@@ -59,7 +62,6 @@ const getChildId = () => {
 };
 
 const createChild = () => {
-  console.log(childPosition.value)
   const node: TreeNode = {
     nodeId: getChildId(),
     nodeValue: childValue.value,
@@ -87,7 +89,6 @@ const createNode = async (node: TreeNode) => {
       position: node.position
     };
 
-    console.log(nodeRequest);
     const { data } = await axios.post('http://localhost:4500/insert', nodeRequest);
     emit('updateNodeTree', data.tree);
   } catch (error) {
@@ -116,11 +117,38 @@ watch(() => props.node, (newNode) => {
 #value {
   display: flex;
   gap: 0.4em;
+  align-items: center;
+  width: 12em;
+  justify-content: space-between;
 }
 
 #buttons {
   display: flex;
   justify-content: space-between;
-  margin: 0.2em;
+  margin: 0.4em 0.2em 0.2em 0.2em;
+  flex-direction: column;
+  gap: 0.4em;
+}
+
+.value-input {
+  width: 6em;
+}
+
+#child-inputs {
+  width: 100%;
+}
+
+#position {
+  display: flex;
+  flex: 1;
+}
+
+#position span {
+  display: flex;
+  justify-content: space-around;
+  flex: 1;
+}
+p {
+  margin: 0;
 }
 </style>

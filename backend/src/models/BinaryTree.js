@@ -130,7 +130,7 @@ class BinaryTree {
     
         if (leafNodes.length === 0) return 0;
     
-        return Math.max(leafNodes.map(leaf => this.getNodeDepth(leaf)));
+        return Math.max(...leafNodes.map(leaf => this.getNodeDepth(leaf)));
     }    
 
     getTreeInfo() {
@@ -146,12 +146,12 @@ class BinaryTree {
         }
     }
 
-    getNodeInfo(value) {
-        let node = this.findNodeByValue(value);
+    getNodeInfo(nodeId) {
+        let node = this.findNodeById(nodeId);
         if (!node) return null;
         
         let nodeDegree = node.degree;
-        let nodeDepth = this.getNodeDepth(value);
+        let nodeDepth = this.getNodeDepth(node);
         let nodeHeight = this.getNodeHeight(node);
 
         return {

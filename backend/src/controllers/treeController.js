@@ -39,8 +39,8 @@ exports.insertNode = (req, res) => {
 
 
 exports.getNodeInfo = (req, res) => {
-    const { value } = req.params;
-    const nodeInfo = tree.getNodeInfo(value);
+    const { nodeId } = req.params;
+    const nodeInfo = tree.getNodeInfo(nodeId);
 
     if (!nodeInfo) {
         return res.status(404).json({ error: "Nó não encontrado" });

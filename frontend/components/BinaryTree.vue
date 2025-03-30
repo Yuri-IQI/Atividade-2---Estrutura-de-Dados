@@ -8,7 +8,7 @@
     />
 
   <div id="tree-composition" v-if="structuredTree.length">
-    <div class="tree-level" v-for="(level, index) in treeLevels" :key="index">
+    <div class="tree-level" :id="'level-' + index" v-for="(level, index) in treeLevels" :key="index">
       <template v-if="level[0].parentNode === null">
         <RootTreeFamily
           :family="level[0]"
@@ -68,6 +68,10 @@ watchEffect(async () => {
     }
   }
 });
+
+watch(props.structuredTree, (updatedTree) => {
+  connectNodes(updatedTree);
+})
 
 const connectNodes = (tree: TreeNode[]) => {
   if (connections.value.length === 0) { 

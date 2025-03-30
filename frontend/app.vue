@@ -3,15 +3,16 @@
     <aside id="info-menu">
       <InformationMenu 
         :key="structuredTree.length"
+        :selectedNode="selectedNode"
       />
     </aside>
     <BinaryTree
-      :key="selectedNode?.nodeId"
+      :key="structuredTree.length"
       :structuredTree="structuredTree"
       :treeLevels="treeLevels"
       @selectNode="getSelectedNode"
     />
-    <aside>
+    <aside id="insertion-menu">
       <NodeMenu
         v-if="selectedNode !== null"
         :node="selectedNode"
@@ -85,7 +86,6 @@ const assignTreeLevels = () => {
       } else {
         const newFamily = createNodeFamily(node);
         treeLevels.value[nextLevelIndex].push(newFamily);
-        console.log(treeLevels.value)
       }
     }
   });
@@ -140,5 +140,11 @@ const checkNodeInsertion = (nodeId: number): NodeTypeEnum => {
   position: absolute;
   top: 0;
   left: 0;
+}
+
+#insertion-menu {
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 </style>

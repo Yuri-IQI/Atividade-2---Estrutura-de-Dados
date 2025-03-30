@@ -39,6 +39,7 @@ const props = defineProps<{
   visibility: visible;
   opacity: 1;
   transition: opacity 0.2s;
+  z-index: 100;
 }
 
 .existing-node {
@@ -47,7 +48,7 @@ const props = defineProps<{
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 9999;
+    z-index: 99;
 
     width: 4em;
     height: 4em;

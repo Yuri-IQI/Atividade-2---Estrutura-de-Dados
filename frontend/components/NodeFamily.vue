@@ -1,6 +1,6 @@
 <template>
     <div class="root-family">
-        <div class="node-group" :class="{'force-right': !left, 'force-left': !right, 'center': left && right}">
+        <div :style="{ left: calculateParentCenter() + '%' }" class="node-group" :class="{'force-right': !left, 'force-left': !right, 'center': left && right}">
             <div class="left-node" v-if="left">
                 <ExistingNode
                     :key="left.nodeId"
@@ -32,6 +32,21 @@ const props = defineProps<{
 const selectNode = (node: TreeNode | null) => {
     if (node) emit('selectNode', node);
 };
+
+const calculateParentCenter = () : number => {
+    if (!props.parent) return 50;
+
+    const parentElement = document.getElementById(props.parent.nodeId.toString());
+    const parentLevelElement = parentElement?.parentElement?.parentElement?.parentElement?.parentElement;
+
+    const parentLevelBoundaries = parentLevelElement?.getBoundingClientRect();
+    const parentElementBoundaries = parentElement?.getBoundingClientRect();
+
+    const parentLevelCenter = parentLevelBoundaries?.width ?? 0 / 2;
+    const parentElementCenter = parentElementBoundaries?.width ?? 0 / 2;
+
+    return (parentElementCenter / parentLevelCenter) * 100;
+}
 </script>
   
 <style scoped>
