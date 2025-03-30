@@ -138,6 +138,8 @@ class BinaryTree {
         let treeHeight = this.getTreeHeight();
         let treeLeaves = this.getLeafNodes();
 
+        if (this.treeNodes.length) treeHeight++;
+
         return {
             treeDegree: treeDegree,
             treeHeight: treeHeight,
@@ -162,8 +164,8 @@ class BinaryTree {
         }
     }
 
-    getNodeFamily(value) {
-        let node = this.findNodeByValue(value);
+    getNodeFamily(nodeId) {
+        let node = this.findNodeById(parseInt(nodeId));
     
         if (typeof node === null || node.parentId === null) {
             console.error("Node or parent not found");
@@ -186,7 +188,7 @@ class BinaryTree {
         let siblingNode = siblingId ? this.findNodeById(siblingId) : null;
     
         let uncleNode = null;
-        if (parentNode.parentId) {
+        if (parentNode.parentId || parentNode.parentId === 0) {
             let grandParentNode = this.findNodeById(parentNode.parentId);
 
             let uncleId = grandParentNode.leftId === parentNode.nodeId ? grandParentNode.rightId : grandParentNode.leftId;

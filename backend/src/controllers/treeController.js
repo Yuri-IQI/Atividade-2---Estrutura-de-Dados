@@ -65,7 +65,7 @@ exports.getNodeFamily = (req, res) => {
 };
 
 exports.doTraversal = (req, res) => {
-    const { traversalType } = req.body;
+    const { traversalType } = req.query;
     const traversalResult = tree.doTraversal(traversalType);
 
     if (!traversalResult) {

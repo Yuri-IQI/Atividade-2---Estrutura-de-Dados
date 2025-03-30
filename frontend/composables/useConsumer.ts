@@ -4,42 +4,45 @@ import type { TreeNode } from '~/types/TreeNode';
 import type { TreeInfo } from '~/types/TreeInfo';
 import type { NodeInfo } from '~/types/NodeInfo';
 import type { NodeFamilyInfo } from '~/types/NodeFamilyInfo';
+import { TraversalTypes } from '~/types/TraversalTypes';
 
-export const useConsumer = async (nodeId: number | null) => {
-    const { data: structuredTree, error: structuredTreeError } = await useAsyncData<TreeNode[]>('structuredTree', async () => {
-        try {
-            const response = await axios.get('http://localhost:4500/structured-tree');
-            return response.data;
-        } catch (error) {
-            console.error('Error fetching structured tree:', error);
-            throw error;
-        }
-    });
+export const useConsumer = async (nodeId: number | null, traversalType: TraversalTypes | null) => {
+    const fetchData = async <T>(key: string, url: string, options?: object) => {
+        return useAsyncData<T>(key, async () => {
+            try {
+                const response = options
+                    ? await axios.request({ url, ...options })
+                    : await axios.get(url);
+                return response.data;
+            } catch (error) {
+                console.error(`Error fetching ${key}:`, error);
+                throw error;
+            }
+        });
+    };
 
-    const { data: treeInfo, error: treeInfoError } = await useAsyncData<TreeInfo>('treeInfo', async () => {
-        try {
-            const response = await axios.get('http://localhost:4500/tree-info');
-            return response.data;
-        } catch (error) {
-            console.error('Error fetching tree info:', error);
-            throw error;
-        }
-    });
+    const { data: structuredTree, error: structuredTreeError } = await fetchData<TreeNode[]>('structuredTree', 'http://localhost:4500/structured-tree');
+    const { data: treeInfo, error: treeInfoError } = await fetchData<TreeInfo>('treeInfo', 'http://localhost:4500/tree-info');
+    
+    const { data: nodeInfo, error: nodeInfoError } = nodeId !== null
+        ? await fetchData<NodeInfo>('nodeInfo', `http://localhost:4500/node-info/${nodeId}`)
+        : { data: null, error: null };
 
-    const { data: nodeInfo, error: nodeInfoError } = await useAsyncData<NodeInfo>('nodeInfo', async () => {
-        if (nodeId || nodeId === 0) {
-            const response = await axios.get(`http://localhost:4500/node-info/${nodeId}`);
-            return response.data;
-        }
-    });
+    const { data: nodeFamilyInfo, error: nodeFamilyInfoError } = nodeId !== null
+        ? await fetchData<NodeFamilyInfo>('nodeFamilyInfo', `http://localhost:4500/node-family/${nodeId}`)
+        : { data: null, error: null };
 
-    const { data: NodeFamilyInfo, error: nodeFamilyInfoError } = await useAsyncData<NodeFamilyInfo>('nodeFamilyInfo', async () => {
-        if (nodeId || nodeId === 0) {
-            const response = await axios.get(`http://localhost:4500/node-family/${nodeId}`);
-            return response.data;
-        }
-    });
-
+    const { data: traversalTree, error: traversalTreeError } = traversalType
+        ? await fetchData<TreeNode[]>(
+            'traversalTree', 
+            `http://localhost:4500/traversal?traversalType=${encodeURIComponent(traversalType)}`,
+            {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            }
+        )
+        : { data: null, error: null };    
+    
     return {
         structuredTree,
         structuredTreeError,
@@ -47,7 +50,9 @@ export const useConsumer = async (nodeId: number | null) => {
         treeInfoError,
         nodeInfo,
         nodeInfoError,
-        NodeFamilyInfo,
-        nodeFamilyInfoError
+        nodeFamilyInfo,
+        nodeFamilyInfoError,
+        traversalTree,
+        traversalTreeError
     };
 };

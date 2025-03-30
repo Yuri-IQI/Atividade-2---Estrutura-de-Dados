@@ -25,21 +25,21 @@ const props = defineProps<{
 }
 
 .tooltip {
-  position: absolute;
-  bottom: 110%;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: black;
-  color: white;
-  padding: 6px;
-  border-radius: 4px;
-  font-size: 14px;
-  font-family: Arial, Helvetica, sans-serif;
-  white-space: nowrap;
-  visibility: visible;
-  opacity: 1;
-  transition: opacity 0.2s;
-  z-index: 100;
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: black;
+    color: white;
+    padding: 6px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+    white-space: nowrap;
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.2s;
+    z-index: 100;
 }
 
 .existing-node {

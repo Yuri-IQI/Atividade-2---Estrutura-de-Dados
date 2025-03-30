@@ -1,12 +1,12 @@
 <template>
   <div id="root-family">
     <div id="root-node">
-        <ExistingNode
-            v-if="root"
-            :key="root.nodeId"
-            :node="root"
-            @click="selectNode(root)"
-        />
+      <ExistingNode
+        v-if="root"
+        :key="root.nodeId"
+        :node="root"
+        @click="selectNode(root)"
+      />
     </div>
   </div>
 </template>
@@ -17,28 +17,29 @@ import type { TreeNode } from '~/types/TreeNode';
   
 const emit = defineEmits(['selectNode']);
 const props = defineProps<{
-    family: NodeFamily | null;
-    root: TreeNode | null
+  family: NodeFamily | null;
+  root: TreeNode | null
 }>();
 
 const selectNode = (node: TreeNode | null) => {
-    if (node) emit('selectNode', node);
+  if (node) emit('selectNode', node);
 };
 </script>
   
 <style scoped>
 #root-family {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
 }
   
 .node-group {
-    display: flex;
-    gap: 1em;
+  display: flex;
+  gap: 1em;
 }
   
 .left-node, .right-node {
-    display: flex;
+  display: flex;
 }
-</style>  
+</style>

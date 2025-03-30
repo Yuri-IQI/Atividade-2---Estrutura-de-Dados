@@ -7,29 +7,29 @@
       @selectNode="selectNode"
     />
 
-  <div id="tree-composition" v-if="structuredTree.length">
-    <div class="tree-level" :id="'level-' + index" v-for="(level, index) in treeLevels" :key="index">
-      <template v-if="level[0].parentNode === null">
-        <RootTreeFamily
-          :family="level[0]"
-          :root="structuredTree.find(n => n.nodeId === 0) ?? null"
-          @selectNode="selectNode"
-        />
-      </template>
+    <div id="tree-composition" v-if="structuredTree.length">
+      <div class="tree-level" :id="'level-' + index" v-for="(level, index) in treeLevels" :key="index">
+        <template v-if="level[0].parentNode === null">
+          <RootTreeFamily
+            :family="level[0]"
+            :root="structuredTree.find(n => n.nodeId === 0) ?? null"
+            @selectNode="selectNode"
+          />
+        </template>
 
-      <template v-else>
-        <NodeFamily
-          v-for="family in level"
-          :key="family.parentNode?.nodeId || `family-${index}`"
-          :parent="family.parentNode"
-          :left="family.leftNode"
-          :right="family.rightNode"
-          @selectNode="selectNode"
-        />
-      </template>
+        <template v-else>
+          <NodeFamily
+            v-for="family in level"
+            :key="family.parentNode?.nodeId || `family-${index}`"
+            :parent="family.parentNode"
+            :left="family.leftNode"
+            :right="family.rightNode"
+            @selectNode="selectNode"
+          />
+        </template>
 
+      </div>
     </div>
-  </div>
 
     <VisualConnection
       v-for="connection in connections"
@@ -58,20 +58,6 @@ const selectNode = (node: TreeNode) => {
 }
 
 let resizeObserver: ResizeObserver | null = null;
-
-watchEffect(async () => {
-  if (props.structuredTree.length > 0) {
-    await nextTick();
-    if (connections.value.length === 0) {
-      recalculateNodeCoordinates();
-      connectNodes(props.structuredTree);
-    }
-  }
-});
-
-watch(props.structuredTree, (updatedTree) => {
-  connectNodes(updatedTree);
-})
 
 const connectNodes = (tree: TreeNode[]) => {
   if (connections.value.length === 0) { 
@@ -129,6 +115,20 @@ onUnmounted(() => {
     resizeObserver.disconnect();
   }
 });
+
+watchEffect(async () => {
+  if (props.structuredTree.length > 0) {
+    await nextTick();
+    if (connections.value.length === 0) {
+      recalculateNodeCoordinates();
+      connectNodes(props.structuredTree);
+    }
+  }
+});
+
+watch(props.structuredTree, (updatedTree) => {
+  connectNodes(updatedTree);
+})
 </script>
 
 <style scoped>
@@ -153,6 +153,5 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1em;
 }
 </style>

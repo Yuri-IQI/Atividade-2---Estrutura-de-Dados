@@ -4,6 +4,7 @@
       <InformationMenu 
         :key="structuredTree.length"
         :selectedNode="selectedNode"
+        @displayTraversal="displayTraversal"
       />
     </aside>
     <BinaryTree
@@ -22,6 +23,10 @@
       />
     </aside>
   </div>
+  <TraversalDisplay v-if="displayType !== TraversalTypes.DEFAULT"
+    :traversalTreeNodes="traversalTree"
+    @closeDisplay="closeDisplay"
+  />
 </template>
 
 <script setup lang="tsx">
@@ -32,13 +37,17 @@ import {ref} from "vue";
 import {NodeTypeEnum} from "~/types/NodeTypeEnum";
 import type { TreeNode } from './types/TreeNode';
 import type { NodeFamily } from './types/NodeFamily';
+import { TraversalTypes } from './types/TraversalTypes';
 
 const structuredTree = ref<TreeNode[]>([]);
 const selectedNode = ref<TreeNode | null>(null);
 const treeLevels = ref<NodeFamily[][]>([]);
+const displayType = ref<TraversalTypes>(TraversalTypes.DEFAULT);
+
+const traversalTree = ref<TreeNode[]>([]);
 
 onMounted(async () => {
-  const treeData = await useConsumer(null);
+  const treeData = await useConsumer(null, null);
   structuredTree.value = treeData.structuredTree?.value ?? [];
   assignTreeLevels();
 });
@@ -126,6 +135,26 @@ const checkNodeInsertion = (nodeId: number): NodeTypeEnum => {
     ? NodeTypeEnum.ACTIVE
     : NodeTypeEnum.BLANK;
 };
+
+const closeDisplay = (traversalType: TraversalTypes) => {
+  displayType.value = traversalType;
+}
+
+const fetchTraversalTree = async (traversalType: TraversalTypes): Promise<TreeNode[]> => {
+  try {
+    const { traversalTree } = await useConsumer(null, traversalType);
+    return traversalTree?.value ?? [];
+  } catch (error) {
+    console.error('Error fetching traversal tree:', error);
+    return [];
+  }
+};
+
+const displayTraversal = async (traversalType: TraversalTypes) => {
+  if (traversalType.match(TraversalTypes.DEFAULT)) return null;
+  traversalTree.value = await fetchTraversalTree(traversalType);
+  displayType.value = traversalType;
+}
 </script>
 
 <style>
@@ -140,6 +169,8 @@ const checkNodeInsertion = (nodeId: number): NodeTypeEnum => {
   position: absolute;
   top: 0;
   left: 0;
+  display: flex;
+  flex-direction: row;
 }
 
 #insertion-menu {
