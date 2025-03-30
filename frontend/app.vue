@@ -38,7 +38,7 @@ const selectedNode = ref<TreeNode | null>(null);
 const treeLevels = ref<NodeFamily[][]>([]);
 
 onMounted(async () => {
-  const treeData = await useConsumer();
+  const treeData = await useConsumer(null);
   structuredTree.value = treeData.structuredTree?.value ?? [];
   assignTreeLevels();
 });

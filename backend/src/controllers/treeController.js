@@ -39,7 +39,7 @@ exports.insertNode = (req, res) => {
 
 
 exports.getNodeInfo = (req, res) => {
-    const { nodeId } = req.params;
+    const nodeId = parseInt(req.params.value);
     const nodeInfo = tree.getNodeInfo(nodeId);
 
     if (!nodeInfo) {

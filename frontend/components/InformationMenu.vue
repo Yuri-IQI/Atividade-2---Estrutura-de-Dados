@@ -5,39 +5,61 @@
       <span>Grau: {{ treeInfo.treeDegree }}</span>
       <span>Altura: {{ treeInfo.treeHeight }}</span>
       <span id="leaves">Folhas: 
-        <p v-for="leaf in treeInfo.treeLeaves" :key="leaf.nodeId">
-          {{ leaf.nodeId.toString() }}
-        </p>
+        <p>{{ treeInfo.treeLeaves.map(l => l.nodeId).toString().replaceAll(',', ', ') }}</p>
       </span>
       <span>Nível: {{ treeInfo.treeLevel }}</span>
     </div>
   </div>
-  <div id="node-menu" class="menu" v-if="selectedNode?.nodeValue">
-    <h3>Informações do Nó: {{ selectedNode.nodeId }}</h3>
+  <div id="node-menu" class="menu" v-if="nodeInfo && selectedNode">
+    <h3>Informações do Nó {{ selectedNode.nodeId }}</h3>
+    <span>Nível: {{ nodeInfo.nodeLevel }}</span>
+    <span>Profundidade: {{ nodeInfo.nodeDepth }}</span>
+    <span>Altura: {{ nodeInfo.nodeHeight }}</span>
+    <span>Grau: {{ nodeInfo.nodeDegree }}</span>
+  </div>
+  <div id="family-menu" class="menu" v-if="nodeFamily && selectedNode">
+    <h3>Informações da Familia</h3>
 
   </div>
 </template>
 
 <script lang="ts" setup>
 import { useConsumer } from '~/composables/useConsumer';
+import type { NodeFamilyInfo } from '~/types/NodeFamilyInfo';
+import type { NodeInfo } from '~/types/NodeInfo';
 import type { TreeInfo } from '~/types/TreeInfo';
 import type { TreeNode } from '~/types/TreeNode';
 
 const treeInfo = ref<TreeInfo>();
+const nodeInfo = ref<NodeInfo | null>(null);
+const nodeFamily = ref<NodeFamilyInfo | null>(null);
 const props = defineProps<{
   selectedNode: TreeNode | null
 }>()
 
 onMounted(async () => {
-  const tree = await useConsumer(props.selectedNode?.nodeId);
-  if (tree.treeInfo.value) {
-    treeInfo.value = tree.treeInfo.value;
-  }
-
-  if (tree.nodeInfo.value) {
-    console.log(tree.nodeInfo)
+  try {
+    const treeInfoResponse = await $fetch<TreeInfo>('http://localhost:4500/tree-info');
+    treeInfo.value = treeInfoResponse;
+  } catch (error) {
+    console.error('Error fetching tree info:', error);
   }
 });
+
+watch(() => props.selectedNode, async (newSelectedNode) => {
+  if (newSelectedNode?.nodeId || (newSelectedNode?.nodeId === 0 && newSelectedNode.nodeValue)) {
+    try {
+      const { nodeInfo: newNodeInfo, nodeFamilyInfoError: newNodeFamily } = await useConsumer(newSelectedNode.nodeId);
+      nodeInfo.value = newNodeInfo.value;
+      nodeFamily.value = newNodeFamily.value.;
+
+    } catch (error) {
+      nodeInfo.value = null;
+    }
+  } else {
+    nodeInfo.value = null
+  }
+})
 </script>
 
 <style scoped>

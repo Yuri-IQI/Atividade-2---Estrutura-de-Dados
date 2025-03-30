@@ -3,8 +3,9 @@ import axios from 'axios';
 import type { TreeNode } from '~/types/TreeNode';
 import type { TreeInfo } from '~/types/TreeInfo';
 import type { NodeInfo } from '~/types/NodeInfo';
+import type { NodeFamilyInfo } from '~/types/NodeFamilyInfo';
 
-export const useConsumer = async (nodeId: number) => {
+export const useConsumer = async (nodeId: number | null) => {
     const { data: structuredTree, error: structuredTreeError } = await useAsyncData<TreeNode[]>('structuredTree', async () => {
         try {
             const response = await axios.get('http://localhost:4500/structured-tree');
@@ -25,15 +26,17 @@ export const useConsumer = async (nodeId: number) => {
         }
     });
 
-    const { data: nodeInfo, error: nodeInfoError } = await useAsyncData<NodeInfo>('nodeInfo', async (nodeId) => {
-        try {
-            const response = await axios.get('http://localhost:4500/node-info', {
-                params: { nodeId: nodeId }
-            });
+    const { data: nodeInfo, error: nodeInfoError } = await useAsyncData<NodeInfo>('nodeInfo', async () => {
+        if (nodeId || nodeId === 0) {
+            const response = await axios.get(`http://localhost:4500/node-info/${nodeId}`);
             return response.data;
-        } catch (error) {
-            console.error('Error fetching tree info:', error);
-            throw error;
+        }
+    });
+
+    const { data: NodeFamilyInfo, error: nodeFamilyInfoError } = await useAsyncData<NodeFamilyInfo>('nodeFamilyInfo', async () => {
+        if (nodeId || nodeId === 0) {
+            const response = await axios.get(`http://localhost:4500/node-family/${nodeId}`);
+            return response.data;
         }
     });
 
@@ -43,6 +46,8 @@ export const useConsumer = async (nodeId: number) => {
         treeInfo,
         treeInfoError,
         nodeInfo,
-        nodeInfoError
+        nodeInfoError,
+        NodeFamilyInfo,
+        nodeFamilyInfoError
     };
 };
