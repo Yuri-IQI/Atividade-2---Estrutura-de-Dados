@@ -26,6 +26,8 @@
   <TraversalDisplay v-if="displayType !== TraversalTypes.DEFAULT"
     :traversalTreeNodes="traversalTree"
     @closeDisplay="closeDisplay"
+    :treeLength="structuredTree.length"
+    :traversalType="displayType"
   />
 </template>
 
