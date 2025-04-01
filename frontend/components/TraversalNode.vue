@@ -11,7 +11,7 @@
         </g>
 
         <g class="node-content" v-if="nodeMap[traversalNode.nodeId]">
-            <circle 
+            <circle class="node-icon"
                 :cx="nodeMap[traversalNode.nodeId]?.x + '%'" 
                 :cy="nodeMap[traversalNode.nodeId]?.y + '%'" 
                 r="20" stroke="black" stroke-width="4" fill="grey" 
@@ -75,16 +75,14 @@ const setNodePosition = (node: TraversalTreeNode) => {
     const offsetY = 18;
 
     props.nodeMap[node.nodeId] = {
-        x: parentCoords.x + (node.parentNode.leftChild === node ? -offsetX : offsetX),
+        x: (parentCoords.x + (node.parentNode.leftChild === node ? -offsetX : offsetX)),
         y: parentCoords.y + offsetY
     };
-
-    solveOverlap();
 }
 
-
-const solveOverlap = () => {
-    
+const getNodeDepth = (node: TraversalTreeNode) => {
+    let depth = 0;
+    return 
 }
 
 const prepareConnections = () => {
