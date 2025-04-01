@@ -144,7 +144,8 @@ class BinaryTree {
             treeDegree: treeDegree,
             treeHeight: treeHeight,
             treeLevel: treeHeight,
-            treeLeaves: treeLeaves
+            treeLeaves: treeLeaves,
+            treeDepth: treeHeight ? treeHeight-1 : 0
         }
     }
 

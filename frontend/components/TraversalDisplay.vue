@@ -10,13 +10,15 @@
                     />
                 </span>
             </div>
-            <div id="traversal-tree">
-                <TraversalNode v-if="traversalTree" 
-                    :traversalNode="traversalTree"
-                    :nodeMap="nodeMap"
-                    :treeLength="treeLength"
-                    :traversalSequence="traversalSequence"
-                />
+            <div ref="treeSpan" id="traversal-tree">
+                <svg id="traversal-svg"  overflow="visible" :viewBox="`0 0 ${treeWidth} ${treeHeight}`">
+                    <TraversalNode v-if="traversalTree" 
+                        :traversalNode="traversalTree"
+                        :nodeMap="nodeMap"
+                        :treeLength="treeLength"
+                        :traversalSequence="traversalSequence"
+                    />
+                </svg>
             </div>
         </div>
     </div>
@@ -28,6 +30,10 @@ import { TraversalTypes } from '~/types/TraversalTypes';
 import type { TreeNode } from '~/types/TreeNode';
 import TraversalNode from './TraversalNode.vue';
 import type { Coordinates } from '~/types/Coordinates';
+
+const treeSpan = ref();
+const treeWidth = ref(0);
+const treeHeight = ref(0);
 
 const traversalTree = ref<TraversalTreeNode | null>();
 const emit = defineEmits(['closeDisplay']);
@@ -82,7 +88,16 @@ const convertTree = () => {
     traversalTree.value = rootNode;
 };
 
+const calculateTreeSpan = () => {
+    if (treeSpan.value) {
+        const { width, height } = treeSpan.value.getBoundingClientRect();
+        treeWidth.value = width;
+        treeHeight.value = height;
+    }
+}
+
 onMounted(() => {
+    calculateTreeSpan();
     convertTree();
 });
 </script>
@@ -136,6 +151,6 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     flex: 1;
-    overflow: auto;
+    overflow: scroll;
 }
 </style>

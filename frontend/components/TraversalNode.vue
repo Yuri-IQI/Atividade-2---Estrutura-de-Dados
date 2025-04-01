@@ -1,53 +1,51 @@
 <template>
-    <svg id="traversal-svg">
-        <g class="umbilical-cord">
-            <line
-                :x1="nodeMap[traversalNode.parentNode?.nodeId || 0].x + '%'" 
-                :y1="nodeMap[traversalNode.parentNode?.nodeId || 0].y + '%'" 
-                :x2="nodeMap[traversalNode.nodeId].x + '%'" 
-                :y2="nodeMap[traversalNode.nodeId].y + '%'"
-                stroke="black" stroke-width="2" 
-            />
-        </g>
+    <g class="umbilical-cord">
+        <line
+            :x1="nodeMap[traversalNode.parentNode?.nodeId || 0].x + '%'" 
+            :y1="nodeMap[traversalNode.parentNode?.nodeId || 0].y + '%'" 
+            :x2="nodeMap[traversalNode.nodeId].x + '%'" 
+            :y2="nodeMap[traversalNode.nodeId].y + '%'"
+            stroke="black" stroke-width="2" 
+        />
+    </g>
 
-        <g class="node-content" v-if="nodeMap[traversalNode.nodeId]">
-            <circle class="node-icon"
-                :cx="nodeMap[traversalNode.nodeId]?.x + '%'" 
-                :cy="nodeMap[traversalNode.nodeId]?.y + '%'" 
-                r="20" stroke="black" stroke-width="4" fill="grey" 
-            />
+    <g class="node-content" v-if="nodeMap[traversalNode.nodeId]">
+        <circle class="node-icon"
+            :cx="nodeMap[traversalNode.nodeId]?.x + '%'" 
+            :cy="nodeMap[traversalNode.nodeId]?.y + '%'" 
+            r="20" stroke="black" stroke-width="4" fill="grey" 
+        />
 
-            <text 
-                :x="nodeMap[traversalNode.nodeId]?.x + '%'" 
-                :y="nodeMap[traversalNode.nodeId]?.y + '%'"
-                text-anchor="middle"
-                dominant-baseline="central"
-            >{{ traversalNode.nodeId }}</text>
+        <text 
+            :x="nodeMap[traversalNode.nodeId]?.x + '%'" 
+            :y="nodeMap[traversalNode.nodeId]?.y + '%'"
+            text-anchor="middle"
+            dominant-baseline="central"
+        >{{ traversalNode.nodeId }}</text>
 
-            <text class="position-text"
-                :x="nodeMap[traversalNode.nodeId]?.x + '%'" 
-                :y="nodeMap[traversalNode.nodeId]?.y + '%'"
-                text-anchor="middle"
-                dominant-baseline="hanging"
-            >{{ traversalSequence.indexOf(traversalNode.nodeId) + 'P' }}</text>
-        </g>
+        <text class="position-text"
+            :x="nodeMap[traversalNode.nodeId]?.x + '%'" 
+            :y="nodeMap[traversalNode.nodeId]?.y + '%'"
+            text-anchor="middle"
+            dominant-baseline="hanging"
+        >{{ traversalSequence.indexOf(traversalNode.nodeId) + 'P' }}</text>
+    </g>
 
-        <g class="node-children">
-            <TraversalNode v-if="traversalNode.leftChild"
-                :traversalNode="traversalNode.leftChild"
-                :nodeMap="nodeMap"
-                :treeLength="treeLength"
-                :traversalSequence="traversalSequence"
-            />
+    <g class="node-children">
+        <TraversalNode v-if="traversalNode.leftChild"
+            :traversalNode="traversalNode.leftChild"
+            :nodeMap="nodeMap"
+            :treeLength="treeLength"
+            :traversalSequence="traversalSequence"
+        />
 
-            <TraversalNode v-if="traversalNode.rightChild"
-                :traversalNode="traversalNode.rightChild"
-                :nodeMap="nodeMap"
-                :treeLength="treeLength"
-                :traversalSequence="traversalSequence"
-            />
-        </g>
-    </svg>
+        <TraversalNode v-if="traversalNode.rightChild"
+            :traversalNode="traversalNode.rightChild"
+            :nodeMap="nodeMap"
+            :treeLength="treeLength"
+            :traversalSequence="traversalSequence"
+        />
+    </g>
 </template>
 
 <script setup lang="ts">
@@ -62,7 +60,7 @@ const props = defineProps<{
     traversalSequence: number[]
 }>();
 
-const setNodePosition = (node: TraversalTreeNode) => {
+const setNodePosition = (node: TraversalTreeNode): void => {
     if (!node.parentNode) {
         props.nodeMap[node.nodeId] = { x: 50, y: 10 };
         return;
@@ -71,19 +69,21 @@ const setNodePosition = (node: TraversalTreeNode) => {
     const parentCoords = props.nodeMap[node.parentNode.nodeId];
     if (!parentCoords) return;
 
-    const offsetX = 8;
-    const offsetY = 18;
+    const offsetY = 24;
+    let nodeLevel = Math.floor(parentCoords.y / offsetY) + 1;
+    let nodePositionY = nodeLevel * offsetY;
+
+    const baseOffsetX = 32;
+    const offsetX = baseOffsetX / Math.pow(2, nodeLevel);
+    
+    const adjustedLeftX = parentCoords.x - offsetX;
+    const adjustedRightX = parentCoords.x + offsetX;
 
     props.nodeMap[node.nodeId] = {
-        x: (parentCoords.x + (node.parentNode.leftChild === node ? -offsetX : offsetX)),
-        y: parentCoords.y + offsetY
+        x: node.parentNode.leftChild === node ? adjustedLeftX : adjustedRightX,
+        y: nodePositionY
     };
-}
-
-const getNodeDepth = (node: TraversalTreeNode) => {
-    let depth = 0;
-    return 
-}
+};
 
 const prepareConnections = () => {
     const umbilicalCords = Array.from(document.querySelectorAll('g.umbilical-cord'));

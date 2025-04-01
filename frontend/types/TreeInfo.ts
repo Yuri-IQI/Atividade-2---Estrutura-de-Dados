@@ -4,5 +4,6 @@ export interface TreeInfo {
     treeDegree: number,
     treeHeight: number,
     treeLevel: number,
-    treeLeaves: TreeNode[]
+    treeLeaves: TreeNode[],
+    treeDepth: number
 } 

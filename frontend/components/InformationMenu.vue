@@ -9,6 +9,7 @@
           <p>{{ treeInfo.treeLeaves.map(l => l.nodeId).toString().replaceAll(',', ', ') }}</p>
         </span>
         <span>Nível: {{ treeInfo.treeLevel }}</span>
+        <span>Profundidade: {{ treeInfo.treeDepth }}</span>
       </div>
     </div>
     <div id="node-menu" class="menu" v-if="nodeInfo && selectedNode">
