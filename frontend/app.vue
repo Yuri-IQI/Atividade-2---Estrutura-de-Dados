@@ -180,4 +180,16 @@ const displayTraversal = async (traversalType: TraversalTypes) => {
   top: 0;
   right: 0;
 }
+
+h1, h2, h3, h4, p, span, div, button {
+  text-shadow: 1px 2px 4px rgba(22, 22, 22, 0.473);
+}
+
+button {
+  background-color: rgba(214, 214, 214, 0.884);
+}
+
+.menu {
+  box-shadow: 2px 1px 4px rgba(22, 22, 22, 0.548);
+}
 </style>
