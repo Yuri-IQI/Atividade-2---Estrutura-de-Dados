@@ -7,5 +7,9 @@ export default defineNuxtConfig({
   },
   devServer: {
     port: 3005
+  },
+  ssr: false,
+  app: {
+    baseURL: "/",
   }
 })
