@@ -249,6 +249,14 @@ class BinaryTree {
     
         return orderedTree;
     }
+
+    cleanTree() {
+        this.treeNodes = [];
+        this.root = null;
+        this.nodeCounter = 0;
+
+        return this.treeNodes;
+    }
 }
 
 module.exports = BinaryTree;

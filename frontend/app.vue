@@ -14,6 +14,7 @@
       @selectNode="getSelectedNode"
     />
     <aside id="insertion-menu">
+      <button id="clean-tree" @click="cleanTree">Apagar Árvore</button>
       <NodeMenu
         v-if="selectedNode !== null"
         :node="selectedNode"
@@ -40,6 +41,7 @@ import {NodeTypeEnum} from "~/types/NodeTypeEnum";
 import type { TreeNode } from './types/TreeNode';
 import type { NodeFamily } from './types/NodeFamily';
 import { TraversalTypes } from './types/TraversalTypes';
+import axios from 'axios';
 
 const structuredTree = ref<TreeNode[]>([]);
 const selectedNode = ref<TreeNode | null>(null);
@@ -101,6 +103,17 @@ const assignTreeLevels = () => {
     }
   });
 };
+
+const cleanTree = async () => {
+  await axios.delete('http://localhost:4500/clean-tree')
+    .then(response => {
+      structuredTree.value = [];
+      selectedNode.value = null;
+      treeLevels.value = [];
+      displayType.value = TraversalTypes.DEFAULT;
+      traversalTree.value = [];
+    });
+}
 
 const createRootFamily = (root: TreeNode): NodeFamily => {
   return {
@@ -176,12 +189,14 @@ const displayTraversal = async (traversalType: TraversalTypes) => {
 }
 
 #insertion-menu {
-  position: absolute;
-  top: 0;
-  right: 0;
+	position: absolute;
+	top: 0;
+	right: 0;
+	display: flex;
+	flex-direction: column;
 }
 
-h1, h2, h3, h4, p, span, div, button {
+h1, h2, h3, h4, p, span, div, input, button {
   text-shadow: 1px 2px 4px rgba(22, 22, 22, 0.473);
 }
 

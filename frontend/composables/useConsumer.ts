@@ -28,7 +28,7 @@ export const useConsumer = async (nodeId: number | null, traversalType: Traversa
         ? await fetchData<NodeInfo>('nodeInfo', `http://localhost:4500/node-info/${nodeId}`)
         : { data: null, error: null };
 
-    const { data: nodeFamilyInfo, error: nodeFamilyInfoError } = nodeId !== null
+    const { data: nodeFamilyInfo, error: nodeFamilyInfoError } = (nodeId !== null) && (nodeId !== 0)
         ? await fetchData<NodeFamilyInfo>('nodeFamilyInfo', `http://localhost:4500/node-family/${nodeId}`)
         : { data: null, error: null };
 

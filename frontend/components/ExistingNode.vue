@@ -33,7 +33,7 @@ const props = defineProps<{
     color: white;
     padding: 6px;
     border-radius: 4px;
-    font-size: 14px;
+    font-size: 10pt;
     font-family: Arial, Helvetica, sans-serif;
     white-space: nowrap;
     visibility: visible;
@@ -50,10 +50,11 @@ const props = defineProps<{
     justify-content: center;
     z-index: 99;
 
-    width: 4em;
-    height: 4em;
-    border: 0.4em solid black;
+    width: 3em;
+    height: 3em;
+    border: 0.2em solid black;
     border-radius: 50%;
     background-color: rgb(175, 171, 171);
+    filter: drop-shadow(2px 3px 4px #1313139c);
 }
 </style>

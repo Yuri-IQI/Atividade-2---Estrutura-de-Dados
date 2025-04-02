@@ -1,5 +1,13 @@
 <template>
   <div id="information">
+    <div id="traversals" class="menu">
+      <h3>Percursos</h3>
+      <div id="traversal-buttons">
+        <button @click="displayTraversal(TraversalTypes.PREORDER)" class="traversal-bt">Pré Ordem</button>
+        <button @click="displayTraversal(TraversalTypes.INORDER)" class="traversal-bt">Em Ordem</button>
+        <button @click="displayTraversal(TraversalTypes.POSTORDER)" class="traversal-bt">Pós Ordem</button>
+      </div>
+    </div>
     <div id="tree-menu" class="menu" v-if="treeInfo">
       <h3>Informações da Árvore</h3>
       <div class="info">
@@ -25,14 +33,6 @@
       <span>Nó Pai: {{ nodeFamily.parent.nodeId }}</span>
       <span v-if="nodeFamily.sibling">Nó Irmão: {{ nodeFamily.sibling.nodeId }}</span>
       <span v-if="nodeFamily.uncle">Nó Tio: {{ nodeFamily.uncle?.nodeId }}</span>
-    </div>
-  </div>
-  <div id="search-and-traversal" class="menu">
-    <h3>Percursos</h3>
-    <div id="traversal-buttons">
-      <button @click="displayTraversal(TraversalTypes.PREORDER)" class="traversal-bt">Pré Ordem</button>
-      <button @click="displayTraversal(TraversalTypes.INORDER)" class="traversal-bt">Em Ordem</button>
-      <button @click="displayTraversal(TraversalTypes.POSTORDER)" class="traversal-bt">Pós Ordem</button>
     </div>
   </div>
 </template>
@@ -72,7 +72,6 @@ watch(() => props.selectedNode, async (newSelectedNode) => {
       const { nodeInfo: newNodeInfo, nodeFamilyInfo: newNodeFamily } = await useConsumer(newSelectedNode.nodeId, null);
       nodeInfo.value = newNodeInfo?.value || null;
       nodeFamily.value = newNodeFamily?.value || null;
-      console.log(nodeFamily.value);
 
     } catch (error) {
       nodeInfo.value = null;
@@ -84,10 +83,6 @@ watch(() => props.selectedNode, async (newSelectedNode) => {
 </script>
 
 <style scoped>
-#information {
-  max-width: 60%;
-}
-
 .menu {
   padding: 0.4em;
   background-color: #f0f0f0;
@@ -115,5 +110,9 @@ h3 {
 
 #leaves p {
   margin: 0;
+}
+
+#traversal-buttons {
+  display: flex;
 }
 </style>

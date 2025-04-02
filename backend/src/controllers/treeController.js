@@ -74,3 +74,7 @@ exports.doTraversal = (req, res) => {
 
     res.json(traversalResult);
 };
+
+exports.cleanTree = (req, res) => {
+    return res.status(204).json(tree.cleanTree())
+}

@@ -8,7 +8,7 @@
                 :y2="end.y"
                 stroke="black"
                 
-                stroke-width="4"
+                stroke-width="2"
             />
         </svg>
     </div>
