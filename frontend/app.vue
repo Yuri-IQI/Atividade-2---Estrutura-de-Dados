@@ -105,7 +105,7 @@ const assignTreeLevels = () => {
 };
 
 const cleanTree = async () => {
-  await axios.delete('http://localhost:4500/clean-tree')
+  await axios.delete('https://cinco-backend-byr2.onrender.com/clean-tree')
     .then(response => {
       structuredTree.value = [];
       selectedNode.value = null;

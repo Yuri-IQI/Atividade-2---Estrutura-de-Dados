@@ -89,7 +89,7 @@ const createNode = async (node: TreeNode) => {
       position: node.position
     };
 
-    const { data } = await axios.post('http://localhost:4500/insert', nodeRequest);
+    const { data } = await axios.post('https://cinco-backend-byr2.onrender.com/insert', nodeRequest);
     emit('updateNodeTree', data.tree);
   } catch (error) {
     console.error('Error creating node:', error);
@@ -118,7 +118,7 @@ watch(() => props.node, (newNode) => {
   display: flex;
   gap: 0.4em;
   align-items: center;
-  width: 12em;
+  width: 100%;
   justify-content: space-between;
 }
 

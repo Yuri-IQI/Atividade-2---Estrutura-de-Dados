@@ -59,7 +59,7 @@ const displayTraversal = (traversalType: TraversalTypes) => {
 
 onMounted(async () => {
   try {
-    const treeInfoResponse = await $fetch<TreeInfo>('http://localhost:4500/tree-info');
+    const treeInfoResponse = await $fetch<TreeInfo>('https://cinco-backend-byr2.onrender.com/tree-info');
     treeInfo.value = treeInfoResponse;
   } catch (error) {
     console.error('Error fetching tree info:', error);
@@ -114,5 +114,7 @@ h3 {
 
 #traversal-buttons {
   display: flex;
+  width: 100%;
+  justify-content: space-between;
 }
 </style>

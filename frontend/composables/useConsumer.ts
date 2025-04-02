@@ -21,21 +21,21 @@ export const useConsumer = async (nodeId: number | null, traversalType: Traversa
         });
     };
 
-    const { data: structuredTree, error: structuredTreeError } = await fetchData<TreeNode[]>('structuredTree', 'http://localhost:4500/structured-tree');
-    const { data: treeInfo, error: treeInfoError } = await fetchData<TreeInfo>('treeInfo', 'http://localhost:4500/tree-info');
+    const { data: structuredTree, error: structuredTreeError } = await fetchData<TreeNode[]>('structuredTree', 'https://cinco-backend-byr2.onrender.com/structured-tree');
+    const { data: treeInfo, error: treeInfoError } = await fetchData<TreeInfo>('treeInfo', 'https://cinco-backend-byr2.onrender.com/tree-info');
     
     const { data: nodeInfo, error: nodeInfoError } = nodeId !== null
-        ? await fetchData<NodeInfo>('nodeInfo', `http://localhost:4500/node-info/${nodeId}`)
+        ? await fetchData<NodeInfo>('nodeInfo', `https://cinco-backend-byr2.onrender.com/node-info/${nodeId}`)
         : { data: null, error: null };
 
     const { data: nodeFamilyInfo, error: nodeFamilyInfoError } = (nodeId !== null) && (nodeId !== 0)
-        ? await fetchData<NodeFamilyInfo>('nodeFamilyInfo', `http://localhost:4500/node-family/${nodeId}`)
+        ? await fetchData<NodeFamilyInfo>('nodeFamilyInfo', `https://cinco-backend-byr2.onrender.com/node-family/${nodeId}`)
         : { data: null, error: null };
 
     const { data: traversalTree, error: traversalTreeError } = traversalType
         ? await fetchData<TreeNode[]>(
             'traversalTree', 
-            `http://localhost:4500/traversal?traversalType=${encodeURIComponent(traversalType)}`,
+            `https://cinco-backend-byr2.onrender.com/traversal?traversalType=${encodeURIComponent(traversalType)}`,
             {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
