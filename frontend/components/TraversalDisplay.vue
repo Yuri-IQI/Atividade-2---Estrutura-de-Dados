@@ -11,7 +11,7 @@
                 </span>
             </div>
             <div ref="treeSpan" id="traversal-tree">
-                <svg id="traversal-svg"  overflow="visible" :viewBox="`0 0 ${treeWidth} ${treeHeight}`">
+                <svg id="traversal-svg"  overflow="scroll" :viewBox="`0 0 ${treeWidth} ${treeHeight}`">
                     <TraversalNode v-if="traversalTree" 
                         :traversalNode="traversalTree"
                         :nodeMap="nodeMap"

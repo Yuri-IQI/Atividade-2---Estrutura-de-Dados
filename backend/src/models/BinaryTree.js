@@ -143,7 +143,7 @@ class BinaryTree {
         return {
             treeDegree: treeDegree,
             treeHeight: treeHeight,
-            treeLevel: treeHeight,
+            treeLevel: treeHeight ? treeHeight-1 : 0,
             treeLeaves: treeLeaves,
             treeDepth: treeHeight ? treeHeight-1 : 0
         }
@@ -161,7 +161,7 @@ class BinaryTree {
             nodeDegree: nodeDegree,
             nodeDepth: nodeDepth,
             nodeHeight: nodeHeight,
-            nodeLevel: nodeDepth + 1
+            nodeLevel: nodeDepth ? nodeDepth-1 : 0
         }
     }
 

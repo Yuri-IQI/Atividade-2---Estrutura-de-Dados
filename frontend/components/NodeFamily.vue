@@ -26,7 +26,6 @@ const props = defineProps<{
     left: TreeNode | null;
     right: TreeNode | null;
 }>();
-const familyPosition = ref();
 
 const selectNode = (node: TreeNode | null) => {
     if (node) emit('selectNode', node);
