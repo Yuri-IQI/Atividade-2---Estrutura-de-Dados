@@ -114,7 +114,7 @@ class BinaryTree {
         const leftHeight = this._getNodeHeight(leftChild);
         const rightHeight = this._getNodeHeight(rightChild);
     
-        return Math.max(leftHeight, rightHeight) + 1;
+        return Math.max(leftHeight, rightHeight) + (node ? 1 : 0);
     }
     
     getNodeHeight(node) {
@@ -145,7 +145,7 @@ class BinaryTree {
             treeHeight: treeHeight,
             treeLevel: treeHeight,
             treeLeaves: treeLeaves,
-            treeDepth: treeHeight ? treeHeight-1 : 0
+            treeDepth: treeHeight
         }
     }
 
@@ -161,7 +161,7 @@ class BinaryTree {
             nodeDegree: nodeDegree,
             nodeDepth: nodeDepth,
             nodeHeight: nodeHeight,
-            nodeLevel: nodeDepth + 1
+            nodeLevel: nodeDepth
         }
     }
 
